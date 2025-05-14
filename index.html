@@ -27,22 +27,7 @@
       padding: 10px;
       margin: 10px;
     }
-    .pokemon-image.tremble {
-      animation: tremble 0.1s ease-in-out infinite;
-    }
-    @keyframes tremble {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(5px); }
-    }
-    @keyframes attackMove {
-      0% { transform: translateX(0); }
-      50% { transform: translateX(50px); }
-      100% { transform: translateX(0); }
-    }
-    .pokemon-image, .pokemon-image2 {
+    .pokemon-image {
       width: 250px;
       height: 250px;
       object-fit: contain;
@@ -54,24 +39,20 @@
       flex: 1;
       position: relative;
     }
-    .flame {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 80px;
-      background-image: url('fire.gif');
-      background-size: cover;
-      animation: flameAnimation 1s infinite;
-      display: none;
-      pointer-events: none;
-      z-index: 2;
+    .health-bar-container {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px auto;
     }
-    @keyframes flameAnimation {
-      0% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.1); }
-      100% { transform: translateX(-50%) scale(1); }
+    .health-bar {
+      height: 100%;
+      background-color: limegreen;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
     }
     .pokemon-switch {
       display: flex;
@@ -89,26 +70,9 @@
       width: 50px;
       height: 50px;
     }
-    .health-bar-container {
-      width: 200px;
-      height: 20px;
-      background-color: #ddd;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px auto;
-    }
-    .health-bar {
-      height: 100%;
-      background-color: limegreen;
-      width: 100%;
-      border-radius: 5px;
-      transition: width 0.3s ease;
-    }
   </style>
 </head>
 <body>
-  <audio id="attack-sound" src="fire.mp3"></audio>
-  
   <h1>🔥 1v1 Turn-Based Battle Game 🔥</h1>
   
   <div id="main-menu">
@@ -130,10 +94,8 @@
 
     <div class="pokemon-container">
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
-      <div class="flame" id="player-flame"></div>
       <div style="position: relative; display: inline-block;">
-        <img class="pokemon-image2" id="enemy-pokemon" src="pokemon2.png" alt="Enemy Pokemon" />
-        <div class="flame" id="enemy-flame"></div>
+        <img class="pokemon-image" id="enemy-pokemon" src="pokemon2.png" alt="Enemy Pokemon" />
       </div>
     </div>
 
@@ -178,7 +140,7 @@
     const player = {
       name: "You",
       hp: 100,
-      mana: 0,
+      mana: 50,
       pokemon: { name: "Pokemon 1", hp: 100, mana: 50, image: "player-pokemon.png" },
       attacks: [
         { name: "Fireball", damage: 20, manaCost: 30 },
@@ -190,7 +152,7 @@
     const enemy = {
       name: "Enemy",
       hp: 100,
-      mana: 0,
+      mana: 50,
       pokemon: { name: "Pokemon 2", hp: 100, mana: 50, image: "pokemon2.png" },
       attacks: [
         { name: "Bite", damage: 15, manaCost: 20 },
@@ -199,11 +161,8 @@
     };
 
     const logDiv = document.getElementById('log');
-    const attackSound = document.getElementById('attack-sound');
     const playerPokemon = document.getElementById('player-pokemon');
     const enemyPokemon = document.getElementById('enemy-pokemon');
-    const playerFlame = document.getElementById('player-flame');
-    const enemyFlame = document.getElementById('enemy-flame');
 
     function changePlayerPokemon(index) {
       if (index === 0) {
@@ -230,46 +189,39 @@
     function attack(index) {
       if (attackInProgress) return;
       attackInProgress = true;
+
       const attack = player.attacks[index];
+
       if (player.mana < attack.manaCost) {
         logDiv.innerHTML = "Not enough mana!";
         attackInProgress = false;
         return;
       }
+
       player.mana -= attack.manaCost;
       enemy.hp -= attack.damage;
       updateBars();
-      logDiv.innerHTML = "You used " + attack.name + " and dealt " + attack.damage + " damage.";
-      
-      // Apply the animation based on the attack
-      if (attack.name === "Punch" || attack.name === "Bite") {
-        playerPokemon.style.animation = "attackMove 0.5s forwards";
-        enemyPokemon.style.animation = "attackMove 0.5s forwards";
-        
-        setTimeout(() => {
-          playerPokemon.style.animation = "";
-          enemyPokemon.style.animation = "";
-        }, 500);
-      }
+
+      logDiv.innerHTML = `You used ${attack.name} and dealt ${attack.damage} damage.`;
 
       if (enemy.hp <= 0) {
         enemy.hp = 0;
         logDiv.innerHTML = "Enemy has been defeated!";
       }
+
       attackInProgress = false;
     }
 
     function updateBars() {
       document.getElementById('player-health-bar').style.width = (player.hp) + "%";
-      document.getElementById('player-mana-bar').style.width = (player.mana) + "%";
       document.getElementById('enemy-health-bar').style.width = (enemy.hp) + "%";
     }
 
     function resetGame() {
       player.hp = 100;
-      player.mana = 0;
+      player.mana = 50;
       enemy.hp = 100;
-      enemy.mana = 0;
+      enemy.mana = 50;
       updateBars();
     }
 
