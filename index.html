@@ -57,6 +57,18 @@
       margin: 5px;
       font-size: 16px;
     }
+    /* Saldırı animasyonu: ileri-geri sarsılma */
+.attack-animation {
+  animation: attack-shake 0.3s ease;
+}
+
+@keyframes attack-shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(10px); }
+  50% { transform: translateX(-10px); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
   </style>
 </head>
 <body>
