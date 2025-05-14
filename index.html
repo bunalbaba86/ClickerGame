@@ -147,6 +147,24 @@
       100% { transform: translateX(-50%) scale(1); }
     }
 
+    .pokemon-switch {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .pokemon-switch button {
+      background-color: transparent;
+      border: 2px solid #ff7e5f;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .pokemon-switch button img {
+      width: 50px;
+      height: 50px;
+    }
   </style>
 </head>
 <body>
@@ -196,6 +214,18 @@
     </div>
   </div>
 
+  <div class="pokemon-switch">
+    <button onclick="changePokemon(0)">
+      <img src="player-pokemon.png" alt="Pokemon 1" />
+    </button>
+    <button onclick="changePokemon(1)">
+      <img src="pokemon2.png" alt="Pokemon 2" />
+    </button>
+    <button onclick="changePokemon(2)">
+      <img src="pokemon3.png" alt="Pokemon 3" />
+    </button>
+  </div>
+
   <div>
     <h3>Saldırı Seç:</h3>
     <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
@@ -243,13 +273,13 @@
     function changePokemon(index) {
       if (index === 0) {
         player.pokemon.image = "player-pokemon.png";
-        enemy.pokemon.image = "pokemon2.png";
+        enemy.pokemon.image = "enemy-pokemon2";
       } else if (index === 1) {
         player.pokemon.image = "pokemon2.png";
-        enemy.pokemon.image = "pokemon3.png";
+        enemy.pokemon.image = "enemy-pokemon.png";
       } else {
         player.pokemon.image = "pokemon3.png";
-        enemy.pokemon.image = "player-pokemon.png";
+        enemy.pokemon.image = "enemy-pokemon.png";
       }
 
       playerPokemon.src = player.pokemon.image;
