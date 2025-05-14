@@ -4,118 +4,117 @@
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-  body {
-    font-family: sans-serif;
-    text-align: center;
-    padding: 20px;
-    background-image: url('my_image.jpg'); /* Buraya arka plan olarak kullanmak istediğiniz resmin yolunu girin */
-    background-size: cover; /* Arka planın tam ekran kaplamasını sağlar */
-    background-position: center; /* Arka planın ortalanması için */
-    color: #fff;
-  }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-image: url('my_image.jpg'); /* Buraya arka plan olarak kullanmak istediğiniz resmin yolunu girin */
+      background-size: cover; /* Arka planın tam ekran kaplamasını sağlar */
+      background-position: center; /* Arka planın ortalanması için */
+      color: #fff;
+    }
 
-  .character-wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 80px; /* Karakterler arasına daha fazla boşluk eklendi */
-    flex-wrap: wrap;
-  }
+    .character-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 80px; /* Karakterler arasına daha fazla boşluk eklendi */
+      flex-wrap: wrap;
+    }
 
-  .character {
-    width: 200px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 15px;
-    padding: 10px;
-    margin: 10px;
-  }
+    .character {
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 15px;
+      padding: 10px;
+      margin: 10px;
+    }
 
-  .character img {
-    width: 200px;
-    height: 250px;
-    border-radius: 10px;
-    background: #eee;
-    padding: 5px;
-  }
+    .character img {
+      width: 200px;
+      height: 250px;
+      border-radius: 10px;
+      background: #eee;
+      padding: 5px;
+    }
 
-  .hp, .mana {
-    margin: 10px 0;
-    font-weight: bold;
-  }
+    .hp {
+      margin: 10px 0;
+      font-weight: bold;
+    }
 
-  .health-bar-container, .mana-bar-container {
-    width: 200px;
-    height: 20px;
-    background-color: #ddd;
-    border: 1px solid #999;
-    border-radius: 5px;
-    margin: 5px auto;
-  }
+    .mana {
+      margin: 10px 0;
+      font-weight: bold;
+    }
 
-  .health-bar, .mana-bar {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.3s ease;
-  }
+    .health-bar-container {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px auto;
+    }
 
-  .health-bar {
-    background-color: limegreen;
-  }
+    .health-bar {
+      height: 100%;
+      background-color: limegreen;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
 
-  .mana-bar {
-    background-color: royalblue;
-  }
+    .log {
+      margin-top: 20px;
+      height: 100px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fff;
+      color: #333;
+    }
 
-  .log {
-    margin-top: 20px;
-    height: 100px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    background: #fff;
-    color: #333;
-  }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      background-color: #ff7e5f;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-  button {
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 16px;
-    background-color: #ff7e5f;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+    button:hover {
+      background-color: #feb47b;
+    }
 
-  button:hover {
-    background-color: #feb47b;
-  }
+    .attack-animation {
+      animation: attack-shake 0.3s ease;
+    }
 
-  .attack-animation {
-    animation: attack-shake 0.3s ease;
-  }
+    @keyframes attack-shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(10px); }
+      50% { transform: translateX(-10px); }
+      75% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
 
-  @keyframes attack-shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(10px); }
-    50% { transform: translateX(-10px); }
-    75% { transform: translateX(5px); }
-    100% { transform: translateX(0); }
-  }
+    #countdown {
+      font-size: 32px;
+      margin-top: 20px;
+      height: 40px;
+      font-weight: bold;
+      color: #ffeb3b;
+      transition: all 0.3s;
+    }
 
-  #countdown {
-    font-size: 32px;
-    margin-top: 20px;
-    height: 40px;
-    font-weight: bold;
-    color: #ffeb3b;
-    transition: all 0.3s;
-  }
-
-  #countdown.welcome {
-    color: limegreen;
-    font-size: 36px;
-  }
-</style>
+    #countdown.welcome {
+      color: limegreen;
+      font-size: 36px;
+    }
+  </style>
 </head>
 <body>
   <audio id="attack-sound" src="fire.mp3"></audio>
@@ -133,10 +132,7 @@
         <div id="player-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="player-hp">HP: 100</div>
-      <div class="mana-bar-container">
-        <div id="player-mana-bar" class="mana-bar"></div>
-      </div>
-      <div class="mana" id="player-mana">Mana: 100</div>
+      <div class="mana" id="player-mana">Mana: 0</div>
     </div>
 
     <div class="character" id="enemy-info">
@@ -149,17 +145,15 @@
         <div id="enemy-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="enemy-hp">HP: 100</div>
-      <div class="mana-bar-container">
-        <div id="enemy-mana-bar" class="mana-bar"></div>
-      </div>
-      <div class="mana" id="enemy-mana">Mana: 100</div>
+      <div class="mana" id="enemy-mana">Mana: 0</div>
     </div>
   </div>
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button id="attack-button" onclick="attack(0)">Ateş Topu (Mana 30, 20 dmg)</button>
-    <button id="attack-button-2" onclick="attack(1)">Yumruk (Mana 10, 10 dmg)</button>
+    <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
+    <button id="attack-button-2" onclick="attack(1)">Yumruk (10 dmg)</button>
+    <button id="attack-button-3" onclick="attack(2)">Mana Toplama (1 dmg, +10 mana)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
@@ -180,33 +174,43 @@
     const player = {
       name: "Sen",
       hp: 100,
-      mana: 100,
+      mana: 0,
       attacks: [
         { name: "Ateş Topu", damage: 20, manaCost: 30 },
-        { name: "Yumruk", damage: 10, manaCost: 10 }
+        { name: "Yumruk", damage: 10, manaCost: 10 },
+        { name: "Mana Toplama", damage: 1, manaCost: 0, manaGain: 10 } // Yeni saldırı
       ]
     };
 
     const enemy = {
       name: "Rakip",
       hp: 100,
-      mana: 100,
+      mana: 0,
       attacks: [
-        { name: "Isırık", damage: 15, manaCost: 15 },
-        { name: "Zehir", damage: 12, manaCost: 20 }
+        { name: "Isırık", damage: 15, manaCost: 20 },
+        { name: "Zehir", damage: 12, manaCost: 15 },
+        { name: "Mana Toplama", damage: 1, manaCost: 0, manaGain: 10 } // Yeni saldırı
       ]
     };
 
     const logDiv = document.getElementById('log');
 
     function attack(index) {
-      if (attackInProgress || player.hp <= 0 || enemy.hp <= 0 || player.mana < player.attacks[index].manaCost) return;
+      if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
+
+      const atk = player.attacks[index];
+
+      if (atk.manaCost && player.mana < atk.manaCost) {
+        log(`${player.name} → Yeterli mana yok!`);
+        return;
+      }
 
       attackInProgress = true;
       showFire('enemy-fire');
 
-      const atk = player.attacks[index];
-      player.mana -= atk.manaCost;  // Mana harcama
+      player.mana -= atk.manaCost;
+      if (atk.manaGain) player.mana += atk.manaGain;
+
       enemy.hp -= atk.damage;
 
       document.querySelector('#enemy-info img').classList.add('attack-animation');
@@ -215,9 +219,8 @@
       }, 300);
 
       document.getElementById('attack-sound').play();
-      log(`${player.name} → ${atk.name} → -${atk.damage} HP, Mana -${atk.manaCost}`);
-
-      updateHPMana();
+      log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
+      updateHP();
 
       if (enemy.hp <= 0) {
         log("🎉 Kazandın!");
@@ -229,13 +232,22 @@
     }
 
     function enemyTurn() {
-      if (player.hp <= 0 || enemy.hp <= 0 || enemy.mana < enemy.attacks[0].manaCost) return;
+      if (player.hp <= 0 || enemy.hp <= 0) return;
 
       showFire('player-fire');
 
       const i = Math.floor(Math.random() * enemy.attacks.length);
       const atk = enemy.attacks[i];
-      enemy.mana -= atk.manaCost;  // Mana harcama
+
+      if (atk.manaCost && enemy.mana < atk.manaCost) {
+        log(`${enemy.name} → Yeterli mana yok!`);
+        attackInProgress = false;
+        return;
+      }
+
+      enemy.mana -= atk.manaCost;
+      if (atk.manaGain) enemy.mana += atk.manaGain;
+
       player.hp -= atk.damage;
 
       document.querySelector('#player-info img').classList.add('attack-animation');
@@ -243,9 +255,8 @@
         document.querySelector('#player-info img').classList.remove('attack-animation');
       }, 300);
 
-      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP, Mana -${atk.manaCost}`);
-
-      updateHPMana();
+      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
+      updateHP();
 
       if (player.hp <= 0) {
         log("😢 Kaybettin!");
@@ -254,21 +265,17 @@
       attackInProgress = false; // Rakip sırası bitince saldırı yapılabilir
     }
 
-    function updateHPMana() {
+    function updateHP() {
       const playerHP = Math.max(0, player.hp);
       const enemyHP = Math.max(0, enemy.hp);
-      const playerMana = Math.max(0, player.mana);
-      const enemyMana = Math.max(0, enemy.mana);
 
       document.getElementById('player-hp').textContent = `HP: ${playerHP}`;
       document.getElementById('enemy-hp').textContent = `HP: ${enemyHP}`;
-      document.getElementById('player-mana').textContent = `Mana: ${playerMana}`;
-      document.getElementById('enemy-mana').textContent = `Mana: ${enemyMana}`;
+      document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
+      document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
 
       document.getElementById('player-health-bar').style.width = `${playerHP}%`;
       document.getElementById('enemy-health-bar').style.width = `${enemyHP}%`;
-      document.getElementById('player-mana-bar').style.width = `${playerMana}%`;
-      document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
 
       document.getElementById('player-health-bar').style.backgroundColor =
         playerHP < 30 ? 'red' : (playerHP < 60 ? 'orange' : 'limegreen');
@@ -302,22 +309,20 @@
           }, 1000);
 
           player.hp = 100;
-          player.mana = 100;
           enemy.hp = 100;
-          enemy.mana = 100;
+          player.mana = 0;
+          enemy.mana = 0;
 
           document.getElementById('player-hp').textContent = `HP: 100`;
           document.getElementById('enemy-hp').textContent = `HP: 100`;
+          document.getElementById('player-mana').textContent = `Mana: 0`;
+          document.getElementById('enemy-mana').textContent = `Mana: 0`;
 
           document.getElementById('player-health-bar').style.width = `100%`;
           document.getElementById('enemy-health-bar').style.width = `100%`;
-          document.getElementById('player-mana-bar').style.width = `100%`;
-          document.getElementById('enemy-mana-bar').style.width = `100%`;
 
           document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
           document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
-          document.getElementById('player-mana-bar').style.backgroundColor = 'royalblue';
-          document.getElementById('enemy-mana-bar').style.backgroundColor = 'royalblue';
 
           logDiv.innerHTML = '';
         }
