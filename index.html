@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <div id="end-screen" style="display:none; font-size:30px; font-weight:bold; color:white; background:rgba(0,0,0,0.7); padding:20px; margin-top:20px;"></div>
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-    /* Genel stil ve düzenlemeler */
     body {
       font-family: sans-serif;
       text-align: center;
@@ -99,6 +97,10 @@
       background-color: #feb47b;
     }
 
+    .flash {
+      box-shadow: 0 0 15px 5px yellow;
+    }
+
     #countdown {
       font-size: 32px;
       margin-top: 20px;
@@ -128,19 +130,19 @@
     }
 
     .flame {
-  position: absolute;
-  top: -30px;         /* Gerekirse ayarlayabilirsin */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 80px;
-  background-image: url('fire.gif');
-  background-size: cover;
-  animation: flameAnimation 1s infinite;
-  display: none;
-  pointer-events: none;
-  z-index: 2;
-}
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      background-image: url('fire.gif');
+      background-size: cover;
+      animation: flameAnimation 1s infinite;
+      display: none;
+      pointer-events: none;
+      z-index: 2;
+    }
 
     @keyframes flameAnimation {
       0% { transform: translateX(-50%) scale(1); }
@@ -148,6 +150,15 @@
       100% { transform: translateX(-50%) scale(1); }
     }
 
+    #end-screen {
+      display:none;
+      font-size:30px;
+      font-weight:bold;
+      color:white;
+      background:rgba(0,0,0,0.7);
+      padding:20px;
+      margin-top:20px;
+    }
   </style>
 </head>
 <body>
@@ -155,8 +166,9 @@
 
   <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
 
+  <div id="end-screen"></div>
+
   <div class="character-wrapper">
-    <!-- Senin Karakterin -->
     <div class="character" id="player-info">
       <h2>Senin Karakterin</h2>
       <div style="position: relative;">
@@ -174,26 +186,26 @@
 
     <div class="pokemon-container">
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
-      <div class="flame" id="player-flame"></div> <!-- Alev efekti -->
+      <div class="flame" id="player-flame"></div>
       <div style="position: relative; display: inline-block;">
-  <img class="pokemon-image2" id="enemy-pokemon" src="enemy-pokemon.png" alt="Enemy Pokemon" />
-  <div class="flame" id="enemy-flame"></div>
-</div>
+        <img class="pokemon-image2" id="enemy-pokemon" src="enemy-pokemon.png" alt="Enemy Pokemon" />
+        <div class="flame" id="enemy-flame"></div>
+      </div>
 
-    <!-- Rakip Karakter -->
-    <div class="character" id="enemy-info">
-      <h2>Rakip Karakter</h2>
-      <div style="position: relative;">
-        <img src="rakip.png" alt="Rakip" id="enemy-image">
-        <div class="mana-bar-container">
-          <div id="enemy-mana-bar" class="mana-bar"></div>
+      <div class="character" id="enemy-info">
+        <h2>Rakip Karakter</h2>
+        <div style="position: relative;">
+          <img src="rakip.png" alt="Rakip" id="enemy-image">
+          <div class="mana-bar-container">
+            <div id="enemy-mana-bar" class="mana-bar"></div>
+          </div>
+          <div class="mana">Mana: <span id="enemy-mana">0</span></div>
         </div>
-        <div class="mana">Mana: <span id="enemy-mana">0</span></div>
+        <div class="health-bar-container">
+          <div id="enemy-health-bar" class="health-bar"></div>
+        </div>
+        <div class="hp" id="enemy-hp">HP: 100</div>
       </div>
-      <div class="health-bar-container">
-        <div id="enemy-health-bar" class="health-bar"></div>
-      </div>
-      <div class="hp" id="enemy-hp">HP: 100</div>
     </div>
   </div>
 
@@ -236,7 +248,6 @@
     const attackSound = document.getElementById('attack-sound');
     const playerPokemon = document.getElementById('player-pokemon');
     const enemyPokemon = document.getElementById('enemy-pokemon');
-    const playerFlame = document.getElementById('player-flame');
     const enemyFlame = document.getElementById('enemy-flame');
 
     function attack(index) {
@@ -255,13 +266,10 @@
           log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
 
           if (atk.name === "Ateş Topu") {
-  enemyFlame.style.display = 'block';
-  attackSound.play();
-
-  setTimeout(() => {
-    enemyFlame.style.display = 'none';
-  }, 1500); // 1.5 saniye sonra alevi gizle
-}
+            enemyFlame.style.display = 'block';
+            attackSound.play();
+            setTimeout(() => enemyFlame.style.display = 'none', 1500);
+          }
 
           playerPokemon.classList.add('tremble');
           enemyPokemon.classList.add('tremble');
@@ -281,38 +289,36 @@
 
       if (enemy.hp <= 0) {
         log("🎉 Kazandın!");
+        showEndMessage("🎉 Kazandın!");
         attackInProgress = false;
         return;
       }
 
-      setTimeout(enemyTurn, 1000); 
+      setTimeout(enemyTurn, 1000);
     }
 
     function enemyTurn() {
-  if (player.hp <= 0 || enemy.hp <= 0) return;
+      if (player.hp <= 0 || enemy.hp <= 0) return;
 
-  // Rastgele saldırı denemesi
-  const atk = enemy.attacks[Math.floor(Math.random() * enemy.attacks.length)];
+      const atk = enemy.attacks[Math.floor(Math.random() * enemy.attacks.length)];
 
-  if (enemy.mana >= atk.manaCost) {
-    player.hp -= atk.damage;
-    enemy.mana -= atk.manaCost;
-    log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
-  } else {
-    // Eğer yeterli mana yoksa, mana kazan
-    enemy.mana += 10;
-    log(`${enemy.name} → Mana kazanıyor (+10)`);
-  }
+      if (enemy.mana >= atk.manaCost) {
+        player.hp -= atk.damage;
+        enemy.mana -= atk.manaCost;
+        log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
+      } else {
+        enemy.mana += 10;
+        log(`${enemy.name} → Mana kazanıyor (+10)`);
+      }
 
-  updateHP();
-  updateMana();
+      updateHP();
+      updateMana();
 
-  if (player.hp <= 0) {
-    log("😢 Kaybettin!");
-  }
-
-  attackInProgress = false;
-}
+      if (player.hp <= 0) {
+        log("😢 Kaybettin!");
+        showEndMessage("😢 Kaybettin!");
+        return;
+      }
 
       attackInProgress = false;
     }
@@ -346,38 +352,44 @@
       logDiv.scrollTop = logDiv.scrollHeight;
     }
 
+    function showEndMessage(message) {
+      document.getElementById("end-screen").textContent = message;
+      document.getElementById("end-screen").style.display = "block";
+    }
+
     function resetGame() {
       player.hp = 100;
       enemy.hp = 100;
       player.mana = 0;
       enemy.mana = 0;
-      enemyFlame.style.display = 'none';  // Yeniden başlatıldığında alevi gizle
+      enemyFlame.style.display = 'none';
+      document.getElementById("end-screen").style.display = "none";
 
       updateHP();
       updateMana();
-
       logDiv.innerHTML = '';
     }
-    function showEndMessage(message) {
-  document.getElementById("end-screen").textContent = message;
-  document.getElementById("end-screen").style.display = "block";
-}
-    if (enemy.hp <= 0) {
-  log("🎉 Kazandın!");
-  showEndMessage("🎉 Kazandın!");
-  attackInProgress = false;
-  return;
-}
 
-if (player.hp <= 0) {
-  log("😢 Kaybettin!");
-  showEndMessage("😢 Kaybettin!");
-}
     document.addEventListener("keydown", (e) => {
-  if (e.key === "1") attack(0);       // Ateş Topu
-  if (e.key === "2") attack(1);       // Yumruk
-  if (e.key === "3") attack(2);       // Temel Saldırı
-});
+      let button;
+      if (e.key === "1") {
+        attack(0);
+        button = document.getElementById("attack-button");
+      }
+      if (e.key === "2") {
+        attack(1);
+        button = document.getElementById("attack-button-2");
+      }
+      if (e.key === "3") {
+        attack(2);
+        button = document.getElementById("attack-button-3");
+      }
+
+      if (button) {
+        button.classList.add("flash");
+        setTimeout(() => button.classList.remove("flash"), 200);
+      }
+    });
   </script>
 </body>
 </html>
