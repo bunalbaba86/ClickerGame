@@ -252,6 +252,7 @@
 
           if (atk.name === "Ateş Topu") {
             enemyFlame.style.display = 'block';  // Ateş topu saldırısı yapıldığında rakip Pokémon'un üstünde alev çıkacak
+            attackSound.play();  // Ateş topu ses efekti çalsın
           }
 
           playerPokemon.classList.add('tremble');
