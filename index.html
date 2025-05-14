@@ -17,11 +17,12 @@
     .character-wrapper {
       display: flex;
       justify-content: center;
-      gap: 80px; /* Karakterler arasına daha fazla boşluk eklendi */
+      gap: 80px;
       flex-wrap: wrap;
     }
 
     .character {
+      position: relative;
       width: 200px;
       background-color: rgba(0, 0, 0, 0.6);
       border-radius: 15px;
@@ -35,16 +36,20 @@
       border-radius: 10px;
       background: #eee;
       padding: 5px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
     }
 
-    .hp {
-      margin: 10px 0;
+    .hp, .mana {
+      position: absolute;
+      top: 10px;
+      right: 10px;
       font-weight: bold;
     }
 
     .mana {
-      margin: 10px 0;
-      font-weight: bold;
+      top: 40px;
     }
 
     .health-bar-container {
@@ -124,10 +129,7 @@
   <div class="character-wrapper">
     <div class="character" id="player-info">
       <h2>Senin Karakterin</h2>
-      <div style="position: relative;">
-        <img src="sen.png" alt="Sen">
-        <img id="player-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
-      </div>
+      <img src="sen.png" alt="Sen">
       <div class="health-bar-container">
         <div id="player-health-bar" class="health-bar"></div>
       </div>
@@ -137,10 +139,7 @@
 
     <div class="character" id="enemy-info">
       <h2>Rakip Karakter</h2>
-      <div style="position: relative;">
-        <img src="rakip.png" alt="Rakip">
-        <img id="enemy-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
-      </div>
+      <img src="rakip.png" alt="Rakip">
       <div class="health-bar-container">
         <div id="enemy-health-bar" class="health-bar"></div>
       </div>
