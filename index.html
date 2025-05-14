@@ -4,134 +4,131 @@
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-image: url('my_image.jpg'); /* Arka plan resmi */
-      background-size: cover;
-      background-position: center;
-      color: #fff;
-      position: relative;
-      height: 100vh;
-    }
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-image: url('my_image.jpg'); /* Buraya arka plan olarak kullanmak istediğiniz resmin yolunu girin */
+    background-size: cover; /* Arka planın tam ekran kaplamasını sağlar */
+    background-position: center; /* Arka planın ortalanması için */
+    color: #fff;
+  }
 
-    .character-wrapper {
-      display: flex;
-      justify-content: space-between;
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      padding: 20px;
-    }
+  .character-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 80px;
+    flex-wrap: wrap;
+    margin-top: 50px;
+  }
 
-    .character {
-      width: 150px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      padding: 10px;
-      text-align: center;
-      position: relative;
-    }
+  .character {
+    width: 200px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    padding: 10px;
+    margin: 10px;
+  }
 
-    .pokemon-wrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      justify-content: space-between;
-      width: 60%;
-    }
+  .character img {
+    width: 200px;
+    height: 250px;
+    border-radius: 10px;
+    background: #eee;
+    padding: 5px;
+  }
 
-    .pokemon {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      overflow: hidden;
-      background-color: #ddd;
-    }
+  .hp {
+    margin: 10px 0;
+    font-weight: bold;
+  }
 
-    .pokemon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  .mana {
+    margin: 10px 0;
+    font-weight: bold;
+  }
 
-    .hp, .mana {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-weight: bold;
-    }
+  .health-bar-container {
+    width: 200px;
+    height: 20px;
+    background-color: #ddd;
+    border: 1px solid #999;
+    border-radius: 5px;
+    margin: 5px auto;
+  }
 
-    .mana {
-      top: 40px;
-    }
+  .health-bar {
+    height: 100%;
+    background-color: limegreen;
+    width: 100%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
 
-    .health-bar-container {
-      width: 150px;
-      height: 20px;
-      background-color: #ddd;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px auto;
-    }
+  .mana-bar-container {
+    width: 200px;
+    height: 10px;
+    background-color: #ddd;
+    border: 1px solid #999;
+    border-radius: 5px;
+    margin: 5px auto;
+  }
 
-    .health-bar {
-      height: 100%;
-      background-color: limegreen;
-      width: 100%;
-      border-radius: 5px;
-      transition: width 0.3s ease;
-    }
+  .mana-bar {
+    height: 100%;
+    background-color: lightblue;
+    width: 0%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
 
-    .log {
-      margin-top: 20px;
-      height: 100px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-      background: #fff;
-      color: #333;
-    }
+  .log {
+    margin-top: 20px;
+    height: 100px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #fff;
+    color: #333;
+  }
 
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      background-color: #ff7e5f;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+  button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    background-color: #ff7e5f;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-    button:hover {
-      background-color: #feb47b;
-    }
+  button:hover {
+    background-color: #feb47b;
+  }
 
-    @keyframes attack-shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(10px); }
-      50% { transform: translateX(-10px); }
-      75% { transform: translateX(5px); }
-      100% { transform: translateX(0); }
-    }
+  #countdown {
+    font-size: 32px;
+    margin-top: 20px;
+    height: 40px;
+    font-weight: bold;
+    color: #ffeb3b;
+    transition: all 0.3s;
+  }
 
-    #countdown {
-      font-size: 32px;
-      margin-top: 20px;
-      height: 40px;
-      font-weight: bold;
-      color: #ffeb3b;
-      transition: all 0.3s;
-    }
+  #countdown.welcome {
+    color: limegreen;
+    font-size: 36px;
+  }
 
-    #countdown.welcome {
-      color: limegreen;
-      font-size: 36px;
-    }
+  .pokemon-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+  }
 
   </style>
 </head>
@@ -140,34 +137,42 @@
 
   <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
 
-  <!-- Pokemonlar Ortada -->
-  <div class="pokemon-wrapper">
-    <div class="pokemon" id="player-pokemon">
-      <img src="player-pokemon.png" alt="Senin Pokemonu"> <!-- Pokemon fotoğrafı -->
-    </div>
-    <div class="pokemon" id="enemy-pokemon">
-      <img src="enemy-pokemon.png" alt="Rakip Pokemonu"> <!-- Rakip Pokemon fotoğrafı -->
-    </div>
-  </div>
-
-  <!-- Karakter Bilgileri Sol ve Sağ Altta -->
   <div class="character-wrapper">
+    <!-- Senin Karakterin -->
     <div class="character" id="player-info">
       <h2>Senin Karakterin</h2>
+      <div style="position: relative;">
+        <img src="sen.png" alt="Sen">
+        <div class="mana-bar-container">
+          <div id="player-mana-bar" class="mana-bar"></div>
+        </div>
+        <div class="mana">Mana: <span id="player-mana">0</span></div>
+      </div>
       <div class="health-bar-container">
         <div id="player-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="player-hp">HP: 100</div>
-      <div class="mana" id="player-mana">Mana: 0</div>
     </div>
 
+    <!-- Canavar Ortada -->
+    <div class="pokemon">
+      <img class="pokemon-image" src="pokemon_image.png" alt="Pokemon" />
+    </div>
+
+    <!-- Rakip Karakter -->
     <div class="character" id="enemy-info">
       <h2>Rakip Karakter</h2>
+      <div style="position: relative;">
+        <img src="rakip.png" alt="Rakip">
+        <div class="mana-bar-container">
+          <div id="enemy-mana-bar" class="mana-bar"></div>
+        </div>
+        <div class="mana">Mana: <span id="enemy-mana">0</span></div>
+      </div>
       <div class="health-bar-container">
         <div id="enemy-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="enemy-hp">HP: 100</div>
-      <div class="mana" id="enemy-mana">Mana: 0</div>
     </div>
   </div>
 
@@ -175,7 +180,6 @@
     <h3>Saldırı Seç:</h3>
     <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
     <button id="attack-button-2" onclick="attack(1)">Yumruk (10 dmg)</button>
-    <button id="attack-button-3" onclick="attack(2)">Mana Toplama (1 dmg, +10 mana)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
@@ -183,15 +187,7 @@
   <div class="log" id="log"></div>
 
   <script>
-    let attackInProgress = false; // Saldırı yapılırken başka saldırıyı engellemek için
-
-    function showFire(id) {
-      const el = document.getElementById(id);
-      el.style.display = 'block';
-      setTimeout(() => {
-        el.style.display = 'none';
-      }, 500);
-    }
+    let attackInProgress = false;
 
     const player = {
       name: "Sen",
@@ -199,8 +195,8 @@
       mana: 0,
       attacks: [
         { name: "Ateş Topu", damage: 20, manaCost: 30 },
-        { name: "Yumruk", damage: 10, manaCost: 10 },
-        { name: "Mana Toplama", damage: 1, manaCost: 0, manaGain: 10 } // Yeni saldırı
+        { name: "Yumruk", damage: 10, manaCost: 0 },
+        { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
       ]
     };
 
@@ -210,7 +206,7 @@
       mana: 0,
       attacks: [
         { name: "Isırık", damage: 15, manaCost: 20 },
-        { name: "Zehir", damage: 12, manaCost: 15 }
+        { name: "Zehir", damage: 12, manaCost: 10 }
       ]
     };
 
@@ -220,26 +216,25 @@
       if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
 
       attackInProgress = true;
-      showFire('enemy-fire');
 
-      const atk = player.attacks[index];
-      if (player.mana < atk.manaCost) {
-        log("Mana yetersiz!");
-        attackInProgress = false;
-        return;
+      if (index === 2) {
+        // Temel saldırı ile mana kazan
+        player.mana += player.attacks[index].manaGain;
+        log(`${player.name} → Temel Saldırı → +${player.attacks[index].manaGain} Mana`);
+      } else {
+        const atk = player.attacks[index];
+        if (player.mana >= atk.manaCost) {
+          enemy.hp -= atk.damage;
+          player.mana -= atk.manaCost;
+          log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
+        } else {
+          log(`${player.name} → Yeterli Mana Yok!`);
+          attackInProgress = false;
+          return;
+        }
       }
-
-      player.mana -= atk.manaCost;
-      enemy.hp -= atk.damage;
-
-      document.querySelector('#enemy-info img').classList.add('attack-animation');
-      setTimeout(() => {
-        document.querySelector('#enemy-info img').classList.remove('attack-animation');
-      }, 300);
-
-      document.getElementById('attack-sound').play();
-      log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
+      updateMana();
 
       if (enemy.hp <= 0) {
         log("🎉 Kazandın!");
@@ -253,31 +248,23 @@
     function enemyTurn() {
       if (player.hp <= 0 || enemy.hp <= 0) return;
 
-      showFire('player-fire');
-
-      const i = Math.floor(Math.random() * enemy.attacks.length);
-      const atk = enemy.attacks[i];
-      if (enemy.mana < atk.manaCost) {
-        enemyTurn(); // Eğer rakibin manası yetmezse yeni bir saldırı yap
-        return;
+      const atk = enemy.attacks[Math.floor(Math.random() * enemy.attacks.length)];
+      if (enemy.mana >= atk.manaCost) {
+        player.hp -= atk.damage;
+        enemy.mana -= atk.manaCost;
+        log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
+      } else {
+        log(`${enemy.name} → Yeterli Mana Yok!`);
       }
 
-      enemy.mana -= atk.manaCost;
-      player.hp -= atk.damage;
-
-      document.querySelector('#player-info img').classList.add('attack-animation');
-      setTimeout(() => {
-        document.querySelector('#player-info img').classList.remove('attack-animation');
-      }, 300);
-
-      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
+      updateMana();
 
       if (player.hp <= 0) {
         log("😢 Kaybettin!");
       }
 
-      attackInProgress = false; // Rakip sırası bitince saldırı yapılabilir
+      attackInProgress = false;
     }
 
     function updateHP() {
@@ -286,16 +273,20 @@
 
       document.getElementById('player-hp').textContent = `HP: ${playerHP}`;
       document.getElementById('enemy-hp').textContent = `HP: ${enemyHP}`;
-      document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
-      document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
 
       document.getElementById('player-health-bar').style.width = `${playerHP}%`;
       document.getElementById('enemy-health-bar').style.width = `${enemyHP}%`;
+    }
 
-      document.getElementById('player-health-bar').style.backgroundColor =
-        playerHP < 30 ? 'red' : (playerHP < 60 ? 'orange' : 'limegreen');
-      document.getElementById('enemy-health-bar').style.backgroundColor =
-        enemyHP < 30 ? 'red' : (enemyHP < 60 ? 'orange' : 'limegreen');
+    function updateMana() {
+      const playerMana = Math.max(0, player.mana);
+      const enemyMana = Math.max(0, enemy.mana);
+
+      document.getElementById('player-mana').textContent = playerMana;
+      document.getElementById('enemy-mana').textContent = enemyMana;
+
+      document.getElementById('player-mana-bar').style.width = `${playerMana}%`;
+      document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
     }
 
     function log(message) {
@@ -306,42 +297,15 @@
     }
 
     function resetGame() {
-      const countdownEl = document.getElementById('countdown');
-      let count = 3;
+      player.hp = 100;
+      enemy.hp = 100;
+      player.mana = 0;
+      enemy.mana = 0;
 
-      countdownEl.textContent = "3...";
+      updateHP();
+      updateMana();
 
-      const countdownInterval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          countdownEl.textContent = count + "...";
-        } else {
-          clearInterval(countdownInterval);
-          countdownEl.textContent = "Dövüş Başladı! 💥";
-
-          setTimeout(() => {
-            countdownEl.textContent = "";
-          }, 1000);
-
-          player.hp = 100;
-          enemy.hp = 100;
-          player.mana = 0;
-          enemy.mana = 0;
-
-          document.getElementById('player-hp').textContent = `HP: 100`;
-          document.getElementById('enemy-hp').textContent = `HP: 100`;
-          document.getElementById('player-mana').textContent = `Mana: 0`;
-          document.getElementById('enemy-mana').textContent = `Mana: 0`;
-
-          document.getElementById('player-health-bar').style.width = `100%`;
-          document.getElementById('enemy-health-bar').style.width = `100%`;
-
-          document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
-          document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
-
-          logDiv.innerHTML = '';
-        }
-      }, 1000);
+      logDiv.innerHTML = '';
     }
   </script>
 </body>
