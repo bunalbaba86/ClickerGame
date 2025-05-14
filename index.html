@@ -142,8 +142,8 @@
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button onclick="attack(0)">Ateş Topu (20 dmg)</button>
-    <button onclick="attack(1)">Yumruk (10 dmg)</button>
+    <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
+    <button id="attack-button-2" onclick="attack(1)">Yumruk (10 dmg)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
@@ -151,6 +151,8 @@
   <div class="log" id="log"></div>
 
   <script>
+    let attackInProgress = false; // Saldırı yapılırken başka saldırıyı engellemek için
+
     function showFire(id) {
       const el = document.getElementById(id);
       el.style.display = 'block';
@@ -180,8 +182,9 @@
     const logDiv = document.getElementById('log');
 
     function attack(index) {
-      if (player.hp <= 0 || enemy.hp <= 0) return;
+      if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
 
+      attackInProgress = true;
       showFire('enemy-fire');
 
       const atk = player.attacks[index];
@@ -198,6 +201,7 @@
 
       if (enemy.hp <= 0) {
         log("🎉 Kazandın!");
+        attackInProgress = false;
         return;
       }
 
@@ -205,6 +209,8 @@
     }
 
     function enemyTurn() {
+      if (player.hp <= 0 || enemy.hp <= 0) return;
+      
       showFire('player-fire');
 
       const i = Math.floor(Math.random() * enemy.attacks.length);
@@ -222,6 +228,8 @@
       if (player.hp <= 0) {
         log("😢 Kaybettin!");
       }
+
+      attackInProgress = false; // Rakip sırası bitince saldırı yapılabilir
     }
 
     function updateHP() {
