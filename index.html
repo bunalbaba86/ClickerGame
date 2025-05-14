@@ -114,6 +114,8 @@
     <h3>Saldırı Seç:</h3>
     <button onclick="attack(0)">Ateş Topu (20 dmg)</button>
     <button onclick="attack(1)">Yumruk (10 dmg)</button>
+    <button onclick="resetGame()">🔄 Yeniden Başlat</button>
+
   </div>
 
   <div class="log" id="log"></div>
@@ -211,6 +213,26 @@ setTimeout(() => {
       logDiv.appendChild(p);
       logDiv.scrollTop = logDiv.scrollHeight;
     }
+    function resetGame() {
+  // HP'leri sıfırla
+  player.hp = 100;
+  enemy.hp = 100;
+
+  // HP metinlerini güncelle
+  document.getElementById('player-hp').textContent = `HP: 100`;
+  document.getElementById('enemy-hp').textContent = `HP: 100`;
+
+  // Can barlarını sıfırla
+  document.getElementById('player-health-bar').style.width = `100%`;
+  document.getElementById('enemy-health-bar').style.width = `100%`;
+
+  document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
+  document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
+
+  // Log temizle
+  logDiv.innerHTML = '';
+}
+
   </script>
 </body>
 </html>
