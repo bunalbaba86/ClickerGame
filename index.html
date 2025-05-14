@@ -8,19 +8,18 @@
     font-family: sans-serif;
     text-align: center;
     padding: 20px;
-    background-image: url('my_image.jpg'); /* Buraya arka plan olarak kullanmak istediğiniz resmin yolunu girin */
-    background-size: cover; /* Arka planın tam ekran kaplamasını sağlar */
-    background-position: center; /* Arka planın ortalanması için */
+    background-image: url('my_image.jpg');
+    background-size: cover;
+    background-position: center;
     color: #fff;
   }
 
   .character-wrapper {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 80px;
-    flex-wrap: wrap;
     margin-top: 50px;
-    position: relative;
   }
 
   .character {
@@ -39,17 +38,12 @@
     padding: 5px;
   }
 
-  .hp {
+  .hp, .mana {
     margin: 10px 0;
     font-weight: bold;
   }
 
-  .mana {
-    margin: 10px 0;
-    font-weight: bold;
-  }
-
-  .health-bar-container {
+  .health-bar-container, .mana-bar-container {
     width: 200px;
     height: 20px;
     background-color: #ddd;
@@ -64,15 +58,6 @@
     width: 100%;
     border-radius: 5px;
     transition: width 0.3s ease;
-  }
-
-  .mana-bar-container {
-    width: 200px;
-    height: 10px;
-    background-color: #ddd;
-    border: 1px solid #999;
-    border-radius: 5px;
-    margin: 5px auto;
   }
 
   .mana-bar {
@@ -122,23 +107,19 @@
     font-size: 36px;
   }
 
-  .pokemon-image {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  .pokemon-image, .pokemon-image2 {
     width: 250px;
     height: 250px;
+    object-fit: contain;
   }
 
-  .pokemon-image2 {
-     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 250px;
-    height: 250px;
-   }
+  .pokemon-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex: 1;
+  }
+
   </style>
 </head>
 <body>
@@ -163,15 +144,10 @@
       <div class="hp" id="player-hp">HP: 100</div>
     </div>
 
-    <!-- Canavar Ortada -->
-    <div class="pokemon">
-      <img class="pokemon-image" src="player-pokemon.png" alt="Pokemon" />
-    </div> 
-
-   <div class="pokemon2">
-      <img class="pokemon-image2" src="enemy-pokemon.png" alt="Pokemon2" />
+    <div class="pokemon-container">
+      <img class="pokemon-image" src="player-pokemon.png" alt="Player Pokemon" />
+      <img class="pokemon-image2" src="enemy-pokemon.png" alt="Enemy Pokemon" />
     </div>
-
 
     <!-- Rakip Karakter -->
     <div class="character" id="enemy-info">
