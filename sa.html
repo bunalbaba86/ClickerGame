@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Clicker Oyunu</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin-top: 50px;
+    }
+    #puan {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    #buton {
+      padding: 20px 40px;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="puan">Puan: 0</div>
+  <button id="buton">Tıkla!</button>
+
+  <script>
+    let puan = 0;
+    const puanAlani = document.getElementById("puan");
+    const buton = document.getElementById("buton");
+
+    buton.addEventListener("click", () => {
+      puan++;
+      puanAlani.textContent = "Puan: " + puan;
+    });
+  </script>
+</body>
+</html>
