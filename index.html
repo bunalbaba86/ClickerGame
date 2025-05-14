@@ -26,6 +26,24 @@
       margin: 10px 0;
       font-weight: bold;
     }
+
+    /* 👇 Can barı stilleri */
+    .health-bar-container {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px auto;
+    }
+    .health-bar {
+      height: 100%;
+      background-color: limegreen;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
     .log {
       margin-top: 20px;
       height: 100px;
@@ -50,12 +68,18 @@
       <h2>Senin Karakterin</h2>
       <img src="sen.png" alt="Sen">
       <div class="hp" id="player-hp">HP: 100</div>
+      <div class="health-bar-container">
+        <div id="player-health-bar" class="health-bar"></div>
+      </div>
     </div>
 
     <div class="character" id="enemy-info">
       <h2>Rakip Karakter</h2>
       <img src="rakip.png" alt="Rakip">
       <div class="hp" id="enemy-hp">HP: 100</div>
+      <div class="health-bar-container">
+        <div id="enemy-health-bar" class="health-bar"></div>
+      </div>
     </div>
   </div>
 
@@ -117,8 +141,20 @@
     }
 
     function updateHP() {
-      document.getElementById('player-hp').textContent = `HP: ${Math.max(0, player.hp)}`;
-      document.getElementById('enemy-hp').textContent = `HP: ${Math.max(0, enemy.hp)}`;
+      const playerHP = Math.max(0, player.hp);
+      const enemyHP = Math.max(0, enemy.hp);
+
+      document.getElementById('player-hp').textContent = `HP: ${playerHP}`;
+      document.getElementById('enemy-hp').textContent = `HP: ${enemyHP}`;
+
+      document.getElementById('player-health-bar').style.width = `${playerHP}%`;
+      document.getElementById('enemy-health-bar').style.width = `${enemyHP}%`;
+
+      document.getElementById('player-health-bar').style.backgroundColor =
+        playerHP < 30 ? 'red' : (playerHP < 60 ? 'orange' : 'limegreen');
+
+      document.getElementById('enemy-health-bar').style.backgroundColor =
+        enemyHP < 30 ? 'red' : (enemyHP < 60 ? 'orange' : 'limegreen');
     }
 
     function log(message) {
@@ -127,7 +163,6 @@
       logDiv.appendChild(p);
       logDiv.scrollTop = logDiv.scrollHeight;
     }
-
   </script>
 </body>
 </html>
