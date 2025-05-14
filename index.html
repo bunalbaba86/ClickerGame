@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>1v1 Battle Game</title>
+  <title>1v1 Dövüş Oyunu</title>
   <style>
     body {
       font-family: sans-serif;
@@ -70,151 +70,114 @@
       width: 50px;
       height: 50px;
     }
+    .attack-effect {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      animation: hit 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes hit {
+      0% { opacity: 1; transform: translate(-50%, -20px); }
+      100% { opacity: 0; transform: translate(-50%, -60px); }
+    }
   </style>
 </head>
 <body>
-  <h1>🔥 1v1 Turn-Based Battle Game 🔥</h1>
-  
+  <h1>🔥 1v1 Dövüş Oyunu 🔥</h1>
+
   <div id="main-menu">
-    <button onclick="startGame()">Play</button>
-    <button onclick="changeLanguage()">Türkçe</button>
+    <button onclick="startGame()">Oyna</button>
   </div>
-  
+
   <div class="character-wrapper" style="display:none">
     <div class="character" id="player-info">
-      <h2>Your Character</h2>
-      <div style="position: relative;">
-        <img src="sen.png" alt="Your Character" id="player-image">
-      </div>
-      <div class="health-bar-container">
-        <div id="player-health-bar" class="health-bar"></div>
-      </div>
+      <h2>Senin Karakterin</h2>
+      <img src="sen.png" alt="Sen" id="player-image">
+      <div class="health-bar-container"><div id="player-health-bar" class="health-bar"></div></div>
       <div class="hp" id="player-hp">HP: 100</div>
+      <div class="hp" id="player-mana">Mana: 50</div>
     </div>
 
     <div class="pokemon-container">
-      <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
-      <div style="position: relative; display: inline-block;">
-        <img class="pokemon-image" id="enemy-pokemon" src="pokemon2.png" alt="Enemy Pokemon" />
-      </div>
+      <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Senin Pokemonun" />
+      <div class="attack-effect" id="attack-effect"></div>
+      <img class="pokemon-image" id="enemy-pokemon" src="pokemon2.png" alt="Rakip Pokemon" />
     </div>
 
     <div class="character" id="enemy-info">
-      <h2>Enemy Character</h2>
-      <div style="position: relative;">
-        <img src="rakip.png" alt="Enemy" id="enemy-image">
-      </div>
-      <div class="health-bar-container">
-        <div id="enemy-health-bar" class="health-bar"></div>
-      </div>
+      <h2>Rakip Karakter</h2>
+      <img src="rakip.png" alt="Rakip" id="enemy-image">
+      <div class="health-bar-container"><div id="enemy-health-bar" class="health-bar"></div></div>
       <div class="hp" id="enemy-hp">HP: 100</div>
+      <div class="hp" id="enemy-mana">Mana: 50</div>
     </div>
   </div>
 
   <div class="pokemon-switch">
-    <button onclick="changePlayerPokemon(0)">
-      <img src="player-pokemon.png" alt="Pokemon 1" />
-    </button>
-    <button onclick="changePlayerPokemon(1)">
-      <img src="pokemon2.png" alt="Pokemon 2" />
-    </button>
-    <button onclick="changePlayerPokemon(2)">
-      <img src="pokemon3.png" alt="Pokemon 3" />
-    </button>
+    <button onclick="changePlayerPokemon(0)"><img src="player-pokemon.png" /></button>
+    <button onclick="changePlayerPokemon(1)"><img src="pokemon2.png" /></button>
+    <button onclick="changePlayerPokemon(2)"><img src="pokemon3.png" /></button>
   </div>
 
   <div>
-    <h3>Choose Attack:</h3>
-    <button id="attack-button" onclick="attack(0)">Fireball (20 dmg)</button>
-    <button id="attack-button-2" onclick="attack(1)">Punch (10 dmg)</button>
-    <button id="attack-button-3" onclick="attack(2)">Basic Attack (Mana +10)</button>
-    <button onclick="resetGame()">🔄 Restart</button>
+    <h3>Saldırı Seç:</h3>
+    <button onclick="attack(0)">Alev Topu (20 dmg)</button>
+    <button onclick="attack(1)">Yumruk (10 dmg)</button>
+    <button onclick="attack(2)">Temel Saldırı (+10 Mana)</button>
+    <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
-  <div id="countdown" class="welcome"></div>
-  <div class="log" id="log"></div>
+  <div id="log" class="log"></div>
 
   <script>
     let attackInProgress = false;
 
     const player = {
-      name: "You",
       hp: 100,
       mana: 50,
-      pokemon: { name: "Pokemon 1", hp: 100, mana: 50, image: "player-pokemon.png" },
+      pokemon: { image: "player-pokemon.png" },
       attacks: [
-        { name: "Fireball", damage: 20, manaCost: 30 },
-        { name: "Punch", damage: 10, manaCost: 5 },
-        { name: "Basic Attack", damage: 1, manaCost: 0, manaGain: 10 }
+        { name: "Alev Topu", damage: 20, manaCost: 30 },
+        { name: "Yumruk", damage: 10, manaCost: 5 },
+        { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
       ]
     };
 
     const enemy = {
-      name: "Enemy",
       hp: 100,
       mana: 50,
-      pokemon: { name: "Pokemon 2", hp: 100, mana: 50, image: "pokemon2.png" },
+      pokemon: { image: "pokemon2.png" },
       attacks: [
-        { name: "Bite", damage: 15, manaCost: 20 },
-        { name: "Poison", damage: 12, manaCost: 10 }
+        { name: "Isırık", damage: 15, manaCost: 20 },
+        { name: "Zehir", damage: 12, manaCost: 10 }
       ]
     };
 
     const logDiv = document.getElementById('log');
-    const playerPokemon = document.getElementById('player-pokemon');
-    const enemyPokemon = document.getElementById('enemy-pokemon');
+    const attackEffect = document.getElementById('attack-effect');
 
     function changePlayerPokemon(index) {
-      if (index === 0) {
-        player.pokemon.image = "player-pokemon.png";
-      } else if (index === 1) {
-        player.pokemon.image = "pokemon2.png";
-      } else {
-        player.pokemon.image = "pokemon3.png";
-      }
-      playerPokemon.src = player.pokemon.image;
-    }
-
-    function changeEnemyPokemon(index) {
-      if (index === 0) {
-        enemy.pokemon.image = "pokemon2.png";
-      } else if (index === 1) {
-        enemy.pokemon.image = "pokemon3.png";
-      } else {
-        enemy.pokemon.image = "pokemon4.png";
-      }
-      enemyPokemon.src = enemy.pokemon.image;
-    }
-
-    function attack(index) {
-      if (attackInProgress) return;
-      attackInProgress = true;
-
-      const attack = player.attacks[index];
-
-      if (player.mana < attack.manaCost) {
-        logDiv.innerHTML = "Not enough mana!";
-        attackInProgress = false;
-        return;
-      }
-
-      player.mana -= attack.manaCost;
-      enemy.hp -= attack.damage;
-      updateBars();
-
-      logDiv.innerHTML = `You used ${attack.name} and dealt ${attack.damage} damage.`;
-
-      if (enemy.hp <= 0) {
-        enemy.hp = 0;
-        logDiv.innerHTML = "Enemy has been defeated!";
-      }
-
-      attackInProgress = false;
+      const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
+      player.pokemon.image = images[index];
+      document.getElementById('player-pokemon').src = player.pokemon.image;
     }
 
     function updateBars() {
-      document.getElementById('player-health-bar').style.width = (player.hp) + "%";
-      document.getElementById('enemy-health-bar').style.width = (enemy.hp) + "%";
+      document.getElementById('player-health-bar').style.width = player.hp + "%";
+      document.getElementById('enemy-health-bar').style.width = enemy.hp + "%";
+      document.getElementById('player-hp').textContent = `HP: ${player.hp}`;
+      document.getElementById('enemy-hp').textContent = `HP: ${enemy.hp}`;
+      document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
+      document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
+    }
+
+    function startGame() {
+      document.getElementById('main-menu').style.display = "none";
+      document.querySelector('.character-wrapper').style.display = "flex";
+      updateBars();
     }
 
     function resetGame() {
@@ -223,19 +186,65 @@
       enemy.hp = 100;
       enemy.mana = 50;
       updateBars();
+      logDiv.textContent = "";
     }
 
-    function startGame() {
-      document.getElementById('main-menu').style.display = "none";
-      document.querySelector('.character-wrapper').style.display = "flex";
+    function showEffect(text) {
+      attackEffect.textContent = text;
+      attackEffect.style.animation = "none";
+      void attackEffect.offsetWidth; 
+      attackEffect.style.animation = "hit 0.5s ease-out forwards";
     }
 
-    function changeLanguage() {
-      document.querySelector('html').lang = "tr";
-      document.querySelector('h1').textContent = "🔥 1v1 Dövüş Oyunu 🔥";
-      document.querySelector('#player-info h2').textContent = "Senin Karakterin";
-      document.querySelector('#enemy-info h2').textContent = "Rakip Karakter";
-      document.querySelector('#countdown').textContent = "Oyun Yakında Başlıyor";
+    function attack(index) {
+      if (attackInProgress) return;
+      attackInProgress = true;
+
+      const atk = player.attacks[index];
+
+      if (player.mana < atk.manaCost) {
+        logDiv.textContent = "Yetersiz mana!";
+        attackInProgress = false;
+        return;
+      }
+
+      player.mana -= atk.manaCost;
+      enemy.hp -= atk.damage;
+      if (atk.manaGain) player.mana += atk.manaGain;
+
+      if (enemy.hp <= 0) {
+        enemy.hp = 0;
+        logDiv.textContent = "Rakip yenildi!";
+        updateBars();
+        showEffect("KO!");
+        return;
+      }
+
+      updateBars();
+      logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
+      showEffect(atk.name);
+
+      setTimeout(enemyAttack, 1000);
+    }
+
+    function enemyAttack() {
+      const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
+      if (enemy.mana >= atk.manaCost) {
+        enemy.mana -= atk.manaCost;
+        player.hp -= atk.damage;
+      }
+
+      if (player.hp <= 0) {
+        player.hp = 0;
+        logDiv.textContent = "Kaybettin!";
+        showEffect("X");
+      } else {
+        logDiv.textContent += ` Rakip ${atk.name} kullandı. ${atk.damage} hasar aldı.`;
+        showEffect(atk.name);
+      }
+
+      updateBars();
+      attackInProgress = false;
     }
   </script>
 </body>
