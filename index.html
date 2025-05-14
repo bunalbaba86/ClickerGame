@@ -209,6 +209,13 @@
       }
 
       player.mana -= atk.manaCost;
+
+      // Elementsel etkileşim ekle
+      if (atk.name === "Alev Topu" && enemy.pokemon.image === "pokemon2.png") {
+        atk.damage = atk.damage / 2;  // Suya karşı ateş zayıf
+        logDiv.textContent = "Alev Topu suya karşı zayıf!";
+      }
+
       enemy.hp -= atk.damage;
       if (atk.manaGain) player.mana += atk.manaGain;
 
@@ -229,6 +236,12 @@
 
     function enemyAttack() {
       const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
+      
+      // Elementsel etkileşim ekle
+      if (atk.name === "Isırık" && player.pokemon.image === "pokemon2.png") {
+        atk.damage = atk.damage * 1.5;  // Suya karşı zehirin etkisi arttı
+      }
+
       if (enemy.mana >= atk.manaCost) {
         enemy.mana -= atk.manaCost;
         player.hp -= atk.damage;
