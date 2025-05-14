@@ -117,6 +117,7 @@
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
 
   </div>
+<div id="countdown" style="font-size: 32px; margin-top: 20px; height: 40px; font-weight: bold; color: #333;"></div>
 
   <div class="log" id="log"></div>
 
@@ -214,24 +215,42 @@ setTimeout(() => {
       logDiv.scrollTop = logDiv.scrollHeight;
     }
     function resetGame() {
-  // HP'leri sıfırla
-  player.hp = 100;
-  enemy.hp = 100;
+  const countdownEl = document.getElementById('countdown');
+  let count = 3;
 
-  // HP metinlerini güncelle
-  document.getElementById('player-hp').textContent = `HP: 100`;
-  document.getElementById('enemy-hp').textContent = `HP: 100`;
+  countdownEl.textContent = "3...";
+  
+  const countdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countdownEl.textContent = count + "...";
+    } else {
+      clearInterval(countdownInterval);
+      countdownEl.textContent = "Dövüş Başladı! 💥";
 
-  // Can barlarını sıfırla
-  document.getElementById('player-health-bar').style.width = `100%`;
-  document.getElementById('enemy-health-bar').style.width = `100%`;
+      // Bir süre sonra bu yazıyı da kaldır
+      setTimeout(() => {
+        countdownEl.textContent = "";
+      }, 1000);
 
-  document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
-  document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
+      // Oyunu gerçekten sıfırla
+      player.hp = 100;
+      enemy.hp = 100;
 
-  // Log temizle
-  logDiv.innerHTML = '';
+      document.getElementById('player-hp').textContent = `HP: 100`;
+      document.getElementById('enemy-hp').textContent = `HP: 100`;
+
+      document.getElementById('player-health-bar').style.width = `100%`;
+      document.getElementById('enemy-health-bar').style.width = `100%`;
+
+      document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
+      document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
+
+      logDiv.innerHTML = '';
+    }
+  }, 1000);
 }
+
 
   </script>
 </body>
