@@ -37,12 +37,12 @@
     padding: 5px;
   }
 
-  .hp {
+  .hp, .mana {
     margin: 10px 0;
     font-weight: bold;
   }
 
-  .health-bar-container {
+  .health-bar-container, .mana-bar-container {
     width: 200px;
     height: 20px;
     background-color: #ddd;
@@ -51,12 +51,18 @@
     margin: 5px auto;
   }
 
-  .health-bar {
+  .health-bar, .mana-bar {
     height: 100%;
-    background-color: limegreen;
-    width: 100%;
     border-radius: 5px;
     transition: width 0.3s ease;
+  }
+
+  .health-bar {
+    background-color: limegreen;
+  }
+
+  .mana-bar {
+    background-color: royalblue;
   }
 
   .log {
@@ -127,6 +133,10 @@
         <div id="player-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="player-hp">HP: 100</div>
+      <div class="mana-bar-container">
+        <div id="player-mana-bar" class="mana-bar"></div>
+      </div>
+      <div class="mana" id="player-mana">Mana: 100</div>
     </div>
 
     <div class="character" id="enemy-info">
@@ -139,13 +149,17 @@
         <div id="enemy-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="enemy-hp">HP: 100</div>
+      <div class="mana-bar-container">
+        <div id="enemy-mana-bar" class="mana-bar"></div>
+      </div>
+      <div class="mana" id="enemy-mana">Mana: 100</div>
     </div>
   </div>
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
-    <button id="attack-button-2" onclick="attack(1)">Yumruk (10 dmg)</button>
+    <button id="attack-button" onclick="attack(0)">Ateş Topu (Mana 30, 20 dmg)</button>
+    <button id="attack-button-2" onclick="attack(1)">Yumruk (Mana 10, 10 dmg)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
@@ -166,30 +180,33 @@
     const player = {
       name: "Sen",
       hp: 100,
+      mana: 100,
       attacks: [
-        { name: "Ateş Topu", damage: 20 },
-        { name: "Yumruk", damage: 10 }
+        { name: "Ateş Topu", damage: 20, manaCost: 30 },
+        { name: "Yumruk", damage: 10, manaCost: 10 }
       ]
     };
 
     const enemy = {
       name: "Rakip",
       hp: 100,
+      mana: 100,
       attacks: [
-        { name: "Isırık", damage: 15 },
-        { name: "Zehir", damage: 12 }
+        { name: "Isırık", damage: 15, manaCost: 15 },
+        { name: "Zehir", damage: 12, manaCost: 20 }
       ]
     };
 
     const logDiv = document.getElementById('log');
 
     function attack(index) {
-      if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
+      if (attackInProgress || player.hp <= 0 || enemy.hp <= 0 || player.mana < player.attacks[index].manaCost) return;
 
       attackInProgress = true;
       showFire('enemy-fire');
 
       const atk = player.attacks[index];
+      player.mana -= atk.manaCost;  // Mana harcama
       enemy.hp -= atk.damage;
 
       document.querySelector('#enemy-info img').classList.add('attack-animation');
@@ -198,8 +215,9 @@
       }, 300);
 
       document.getElementById('attack-sound').play();
-      log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
-      updateHP();
+      log(`${player.name} → ${atk.name} → -${atk.damage} HP, Mana -${atk.manaCost}`);
+
+      updateHPMana();
 
       if (enemy.hp <= 0) {
         log("🎉 Kazandın!");
@@ -211,12 +229,13 @@
     }
 
     function enemyTurn() {
-      if (player.hp <= 0 || enemy.hp <= 0) return;
-      
+      if (player.hp <= 0 || enemy.hp <= 0 || enemy.mana < enemy.attacks[0].manaCost) return;
+
       showFire('player-fire');
 
       const i = Math.floor(Math.random() * enemy.attacks.length);
       const atk = enemy.attacks[i];
+      enemy.mana -= atk.manaCost;  // Mana harcama
       player.hp -= atk.damage;
 
       document.querySelector('#player-info img').classList.add('attack-animation');
@@ -224,8 +243,9 @@
         document.querySelector('#player-info img').classList.remove('attack-animation');
       }, 300);
 
-      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
-      updateHP();
+      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP, Mana -${atk.manaCost}`);
+
+      updateHPMana();
 
       if (player.hp <= 0) {
         log("😢 Kaybettin!");
@@ -234,15 +254,21 @@
       attackInProgress = false; // Rakip sırası bitince saldırı yapılabilir
     }
 
-    function updateHP() {
+    function updateHPMana() {
       const playerHP = Math.max(0, player.hp);
       const enemyHP = Math.max(0, enemy.hp);
+      const playerMana = Math.max(0, player.mana);
+      const enemyMana = Math.max(0, enemy.mana);
 
       document.getElementById('player-hp').textContent = `HP: ${playerHP}`;
       document.getElementById('enemy-hp').textContent = `HP: ${enemyHP}`;
+      document.getElementById('player-mana').textContent = `Mana: ${playerMana}`;
+      document.getElementById('enemy-mana').textContent = `Mana: ${enemyMana}`;
 
       document.getElementById('player-health-bar').style.width = `${playerHP}%`;
       document.getElementById('enemy-health-bar').style.width = `${enemyHP}%`;
+      document.getElementById('player-mana-bar').style.width = `${playerMana}%`;
+      document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
 
       document.getElementById('player-health-bar').style.backgroundColor =
         playerHP < 30 ? 'red' : (playerHP < 60 ? 'orange' : 'limegreen');
@@ -276,16 +302,22 @@
           }, 1000);
 
           player.hp = 100;
+          player.mana = 100;
           enemy.hp = 100;
+          enemy.mana = 100;
 
           document.getElementById('player-hp').textContent = `HP: 100`;
           document.getElementById('enemy-hp').textContent = `HP: 100`;
 
           document.getElementById('player-health-bar').style.width = `100%`;
           document.getElementById('enemy-health-bar').style.width = `100%`;
+          document.getElementById('player-mana-bar').style.width = `100%`;
+          document.getElementById('enemy-mana-bar').style.width = `100%`;
 
           document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
           document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
+          document.getElementById('player-mana-bar').style.backgroundColor = 'royalblue';
+          document.getElementById('enemy-mana-bar').style.backgroundColor = 'royalblue';
 
           logDiv.innerHTML = '';
         }
