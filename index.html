@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>1v1 Dövüş Oyunu</title>
+  <title>1v1 Battle Game</title>
   <style>
     body {
       font-family: sans-serif;
@@ -149,18 +149,18 @@
 <body>
   <audio id="attack-sound" src="fire.mp3"></audio>
   
-  <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
+  <h1>🔥 1v1 Turn-Based Battle Game 🔥</h1>
   
   <div id="main-menu">
-    <button onclick="startGame()">Oyna</button>
-    <button onclick="changeLanguage()">English</button>
+    <button onclick="startGame()">Play</button>
+    <button onclick="changeLanguage()">Türkçe</button>
   </div>
   
   <div class="character-wrapper" style="display:none">
     <div class="character" id="player-info">
-      <h2>Senin Karakterin</h2>
+      <h2>Your Character</h2>
       <div style="position: relative;">
-        <img src="sen.png" alt="Sen" id="player-image">
+        <img src="sen.png" alt="Your Character" id="player-image">
         <div class="mana-bar-container">
           <div id="player-mana-bar" class="mana-bar"></div>
         </div>
@@ -182,9 +182,9 @@
     </div>
 
     <div class="character" id="enemy-info">
-      <h2>Rakip Karakter</h2>
+      <h2>Enemy Character</h2>
       <div style="position: relative;">
-        <img src="rakip.png" alt="Rakip" id="enemy-image">
+        <img src="rakip.png" alt="Enemy" id="enemy-image">
         <div class="mana-bar-container">
           <div id="enemy-mana-bar" class="mana-bar"></div>
         </div>
@@ -210,11 +210,11 @@
   </div>
 
   <div>
-    <h3>Saldırı Seç:</h3>
-    <button id="attack-button" onclick="attack(0)">Ateş Topu (20 dmg)</button>
-    <button id="attack-button-2" onclick="attack(1)">Yumruk (10 dmg)</button>
-    <button id="attack-button-3" onclick="attack(2)">Temel Saldırı (Mana +10)</button>
-    <button onclick="resetGame()">🔄 Yeniden Başlat</button>
+    <h3>Choose Attack:</h3>
+    <button id="attack-button" onclick="attack(0)">Fireball (20 dmg)</button>
+    <button id="attack-button-2" onclick="attack(1)">Punch (10 dmg)</button>
+    <button id="attack-button-3" onclick="attack(2)">Basic Attack (Mana +10)</button>
+    <button onclick="resetGame()">🔄 Restart</button>
   </div>
 
   <div id="countdown" class="welcome"></div>
@@ -224,25 +224,25 @@
     let attackInProgress = false;
 
     const player = {
-      name: "Sen",
+      name: "You",
       hp: 100,
       mana: 0,
       pokemon: { name: "Pokemon 1", hp: 100, mana: 50, image: "player-pokemon.png" },
       attacks: [
-        { name: "Ateş Topu", damage: 20, manaCost: 30 },
-        { name: "Yumruk", damage: 10, manaCost: 5 },
-        { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
+        { name: "Fireball", damage: 20, manaCost: 30 },
+        { name: "Punch", damage: 10, manaCost: 5 },
+        { name: "Basic Attack", damage: 1, manaCost: 0, manaGain: 10 }
       ]
     };
 
     const enemy = {
-      name: "Rakip",
+      name: "Enemy",
       hp: 100,
       mana: 0,
       pokemon: { name: "Pokemon 2", hp: 100, mana: 50, image: "pokemon2.png" },
       attacks: [
-        { name: "Isırık", damage: 15, manaCost: 20 },
-        { name: "Zehir", damage: 12, manaCost: 10 }
+        { name: "Bite", damage: 15, manaCost: 20 },
+        { name: "Poison", damage: 12, manaCost: 10 }
       ]
     };
 
@@ -280,16 +280,15 @@
       attackInProgress = true;
       const attack = player.attacks[index];
       if (player.mana < attack.manaCost) {
-        logDiv.innerHTML = "Yeterli mananız yok!";
+        logDiv.innerHTML = "Not enough mana!";
         attackInProgress = false;
         return;
       }
       player.mana -= attack.manaCost;
-      player.hp -= attack.damage;
       enemy.hp -= attack.damage;
       updateBars();
-      logDiv.innerHTML = "Siz " + attack.name + " ile " + attack.damage + " vurduğunuzda.";
-      if (attack.name === "Yumruk") {
+      logDiv.innerHTML = "You used " + attack.name + " and dealt " + attack.damage + " damage.";
+      if (attack.name === "Punch") {
         playerPokemon.style.animation = "tremble 0.2s ease-in-out";
         setTimeout(() => {
           playerPokemon.style.animation = "";
@@ -297,7 +296,7 @@
       }
       if (enemy.hp <= 0) {
         enemy.hp = 0;
-        logDiv.innerHTML = "Rakip Yenildi!";
+        logDiv.innerHTML = "Enemy has been defeated!";
       }
       attackInProgress = false;
     }
@@ -322,11 +321,11 @@
     }
 
     function changeLanguage() {
-      document.querySelector('html').lang = "en";
-      document.querySelector('h1').textContent = "🔥 1v1 Turn-Based Battle Game 🔥";
-      document.querySelector('#player-info h2').textContent = "Your Character";
-      document.querySelector('#enemy-info h2').textContent = "Enemy Character";
-      document.querySelector('#countdown').textContent = "Game Starts Soon";
+      document.querySelector('html').lang = "tr";
+      document.querySelector('h1').textContent = "🔥 1v1 Dövüş Oyunu 🔥";
+      document.querySelector('#player-info h2').textContent = "Senin Karakterin";
+      document.querySelector('#enemy-info h2').textContent = "Rakip Karakter";
+      document.querySelector('#countdown').textContent = "Oyun Yakında Başlıyor";
     }
   </script>
 </body>
