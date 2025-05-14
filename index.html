@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <div id="end-screen" style="display:none; font-size:30px; font-weight:bold; color:white; background:rgba(0,0,0,0.7); padding:20px; margin-top:20px;"></div>
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-    /* Genel stil ve düzenlemeler */
     body {
       font-family: sans-serif;
       text-align: center;
@@ -350,7 +348,6 @@
           log("😢 Kaybettin!");
         }
       } else {
-        // Eğer yeterli mana yoksa, mana kazan
         enemy.mana += 10;
         log(`${enemy.name} → Mana kazanıyor (+10)`);
       }
