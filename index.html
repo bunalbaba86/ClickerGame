@@ -214,17 +214,29 @@
     </div>
   </div>
 
-  <div class="pokemon-switch">
-    <button onclick="changePokemon(0)">
-      <img src="player-pokemon.png" alt="Pokemon 1" />
-    </button>
-    <button onclick="changePokemon(1)">
-      <img src="pokemon2.png" alt="Pokemon 2" />
-    </button>
-    <button onclick="changePokemon(2)">
-      <img src="pokemon3.png" alt="Pokemon 3" />
-    </button>
-  </div>
+ <!-- Oyuncu Pokémon Değiştirme Butonları -->
+<div class="pokemon-switch">
+  <button onclick="changePlayerPokemon(0)">
+    <img src="player-pokemon.png" alt="Pokemon 1" />
+  </button>
+  <button onclick="changePlayerPokemon(1)">
+    <img src="pokemon2.png" alt="Pokemon 2" />
+  </button>
+  <button onclick="changePlayerPokemon(2)">
+    <img src="pokemon3.png" alt="Pokemon 3" />
+  </button>
+</div>
+
+<!-- Rakip Pokémon Değiştirme Butonları (Kendi iradesiyle)-->
+<div class="pokemon-switch">
+  <button onclick="changeEnemyPokemon(0)">
+    <img src="pokemon2.png" alt="Enemy Pokemon 1" />
+  </button>
+  <button onclick="changeEnemyPokemon(1)">
+    <img src="pokemon3.png" alt="Enemy Pokemon 2" />
+  </button>
+</div>
+
 
   <div>
     <h3>Saldırı Seç:</h3>
