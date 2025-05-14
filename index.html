@@ -1,39 +1,99 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Clicker Oyunu</title>
+  <meta charset="UTF-8" />
+  <title>1v1 Dövüş Oyunu</title>
   <style>
-    body {
-      text-align: center;
-      font-family: Arial, sans-serif;
-      margin-top: 50px;
-    }
-    #puan {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    #buton {
-      padding: 20px 40px;
-      font-size: 1.5em;
-      cursor: pointer;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+    .hp { margin: 10px 0; font-weight: bold; }
+    .log { margin-top: 20px; height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #fff; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; }
   </style>
 </head>
-<script src="script.js"></script> 
-  <body>
-  <div id="puan">Puan: 0</div>
-  <button id="buton">Tıkla!</button>
+<body>
+
+  <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
+
+  <div id="player-info">
+    <h2>Senin Karakterin</h2>
+    <div class="hp" id="player-hp">HP: 100</div>
+  </div>
+
+  <div id="enemy-info">
+    <h2>Rakip Karakter</h2>
+    <div class="hp" id="enemy-hp">HP: 100</div>
+  </div>
+
+  <div>
+    <h3>Saldırı Seç:</h3>
+    <button onclick="attack(0)">Ateş Topu (20 dmg)</button>
+    <button onclick="attack(1)">Yumruk (10 dmg)</button>
+  </div>
+
+  <div class="log" id="log"></div>
 
   <script>
-    let puan = 0;
-    const puanAlani = document.getElementById("puan");
-    const buton = document.getElementById("buton");
+    const player = {
+      name: "Sen",
+      hp: 100,
+      attacks: [
+        { name: "Ateş Topu", damage: 20 },
+        { name: "Yumruk", damage: 10 }
+      ]
+    };
 
-    buton.addEventListener("click", () => {
-      puan++;
-      puanAlani.textContent = "Puan: " + puan;
-    });
+    const enemy = {
+      name: "Rakip",
+      hp: 100,
+      attacks: [
+        { name: "Isırık", damage: 15 },
+        { name: "Zehir", damage: 12 }
+      ]
+    };
+
+    const logDiv = document.getElementById('log');
+
+    function attack(index) {
+      if (player.hp <= 0 || enemy.hp <= 0) return;
+
+      const atk = player.attacks[index];
+      enemy.hp -= atk.damage;
+      log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
+
+      updateHP();
+
+      if (enemy.hp <= 0) {
+        log("🎉 Kazandın!");
+        return;
+      }
+
+      setTimeout(enemyTurn, 1000);
+    }
+
+    function enemyTurn() {
+      const i = Math.floor(Math.random() * enemy.attacks.length);
+      const atk = enemy.attacks[i];
+      player.hp -= atk.damage;
+      log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
+
+      updateHP();
+
+      if (player.hp <= 0) {
+        log("😢 Kaybettin!");
+      }
+    }
+
+    function updateHP() {
+      document.getElementById('player-hp').textContent = `HP: ${Math.max(0, player.hp)}`;
+      document.getElementById('enemy-hp').textContent = `HP: ${Math.max(0, enemy.hp)}`;
+    }
+
+    function log(message) {
+      const p = document.createElement("p");
+      p.textContent = message;
+      logDiv.appendChild(p);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
   </script>
 </body>
 </html>
