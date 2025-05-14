@@ -107,6 +107,14 @@
   <div class="log" id="log"></div>
 
   <script>
+    function showFire(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  setTimeout(() => {
+    el.style.display = 'none';
+  }, 500);
+}
+
     const player = {
       name: "Sen",
       hp: 100,
@@ -129,6 +137,8 @@
 
     function attack(index) {
       if (player.hp <= 0 || enemy.hp <= 0) return;
+      
+showFire('enemy-fire');
 
       const atk = player.attacks[index];
       enemy.hp -= atk.damage;      document.querySelector('#enemy-info img').classList.add('attack-animation');
@@ -150,6 +160,7 @@ setTimeout(() => {
     }
 
     function enemyTurn() {
+      showFire('player-fire');
       const i = Math.floor(Math.random() * enemy.attacks.length);
       const atk = enemy.attacks[i];
       player.hp -= atk.damage; document.querySelector('#player-info img').classList.add('attack-animation');
