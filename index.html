@@ -256,9 +256,42 @@
       attackInProgress = true;
 
       if (index === 2) {
-        player.mana += player.attacks[index].manaGain;
-        log(`${player.name} → Temel Saldırı → +${player.attacks[index].manaGain} Mana`);
-      } else {
+  const atk = player.attacks[index];
+  enemy.hp -= atk.damage; // -1 hasar
+  player.mana += atk.manaGain;
+  log(`${player.name} → Temel Saldırı → -${Math.abs(atk.damage)} HP, +${atk.manaGain} Mana`);
+} else {
+  const atk = player.attacks[index];
+  if (player.mana >= atk.manaCost) {
+    let isCritical = Math.random() < (Math.random() * 0.2 + 0.1); // %10-%30 arası kritik şansı
+    let damage = atk.damage;
+    if (isCritical) {
+      damage *= 2;
+    }
+    enemy.hp -= damage;
+    player.mana -= atk.manaCost;
+
+    log(`${player.name} → ${atk.name} → -${damage} HP${isCritical ? ' (⚡ Kritik Vuruş!)' : ''}`);
+
+    if (atk.name === "Ateş Topu") {
+      enemyFlame.style.display = 'block';
+      attackSound.play();
+      setTimeout(() => enemyFlame.style.display = 'none', 1500);
+    }
+
+    playerPokemon.classList.add('tremble');
+    enemyPokemon.classList.add('tremble');
+    setTimeout(() => {
+      playerPokemon.classList.remove('tremble');
+      enemyPokemon.classList.remove('tremble');
+    }, 300);
+  } else {
+    log(`${player.name} → Yeterli Mana Yok!`);
+    attackInProgress = false;
+    return;
+  }
+}
+
         const atk = player.attacks[index];
         if (player.mana >= atk.manaCost) {
           enemy.hp -= atk.damage;
