@@ -128,7 +128,12 @@
       if (player.hp <= 0 || enemy.hp <= 0) return;
 
       const atk = player.attacks[index];
-      enemy.hp -= atk.damage;
+      enemy.hp -= atk.damage;      document.querySelector('#enemy-info img').classList.add('attack-animation');
+setTimeout(() => {
+  document.querySelector('#enemy-info img').classList.remove('attack-animation');
+}, 300);
+
+
       log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
 
@@ -136,14 +141,18 @@
         log("🎉 Kazandın!");
         return;
       }
-
+ 
       setTimeout(enemyTurn, 1000);
     }
 
     function enemyTurn() {
       const i = Math.floor(Math.random() * enemy.attacks.length);
       const atk = enemy.attacks[i];
-      player.hp -= atk.damage;
+      player.hp -= atk.damage; document.querySelector('#player-info img').classList.add('attack-animation');
+setTimeout(() => {
+  document.querySelector('#player-info img').classList.remove('attack-animation');
+}, 300);
+
       log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
 
