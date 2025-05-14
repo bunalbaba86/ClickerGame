@@ -134,6 +134,7 @@ setTimeout(() => {
   document.querySelector('#enemy-info img').classList.remove('attack-animation');
 }, 300);
 
+  document.getElementById('attack-sound').play();
 
       log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
