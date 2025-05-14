@@ -227,15 +227,6 @@
     </button>
   </div>
 
-  <!-- Rakip Pokémon Değiştirme Butonları (Sadece rakip için) -->
-  <div class="pokemon-switch">
-    <button onclick="changeEnemyPokemon(0)">
-      <img src="pokemon2.png" alt="Enemy Pokemon 1" />
-    </button>
-    <button onclick="changeEnemyPokemon(1)">
-      <img src="pokemon3.png" alt="Enemy Pokemon 2" />
-    </button>
-  </div>
 
   <div>
     <h3>Saldırı Seç:</h3>
@@ -294,16 +285,6 @@
       playerPokemon.src = player.pokemon.image; // Oyuncunun Pokémon'unu değiştir
     }
 
-    // Rakip Pokémon Değiştirme
-    function changeEnemyPokemon(index) {
-      if (index === 0) {
-        enemy.pokemon.image = "pokemon2.png";
-      } else {
-        enemy.pokemon.image = "pokemon3.png";
-      }
-
-      enemyPokemon.src = enemy.pokemon.image; // Rakibin Pokémon'unu değiştir
-    }
   </script>
 </body>
 </html>
