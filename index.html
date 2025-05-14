@@ -190,10 +190,15 @@
         <div id="player-health-bar" class="health-bar"></div>
       </div>
       <div class="hp" id="player-hp">HP: 100</div>
+      <div>
+        <button onclick="changePokemon(0)">Pokemon 1</button>
+        <button onclick="changePokemon(1)">Pokemon 2</button>
+        <button onclick="changePokemon(2)">Pokemon 3</button>
+      </div>
     </div>
 
     <div class="pokemon-container">
-      <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
+      <img class="pokemon-image" id="player-pokemon" src="pokemon1.png" alt="Player Pokemon" />
       <div class="flame" id="player-flame"></div> <!-- Alev efekti -->
       <div style="position: relative; display: inline-block;">
         <img class="pokemon-image2" id="enemy-pokemon" src="enemy-pokemon.png" alt="Enemy Pokemon" />
@@ -231,10 +236,19 @@
   <script>
     let attackInProgress = false;
 
+    const pokemons = [
+      { name: "Pokemon 1", hp: 100, mana: 50, image: "pokemon1.png" },
+      { name: "Pokemon 2", hp: 120, mana: 30, image: "pokemon2.png" },
+      { name: "Pokemon 3", hp: 80, mana: 70, image: "pokemon3.png" }
+    ];
+
+    let selectedPokemon = 0;
+
     const player = {
       name: "Sen",
       hp: 100,
       mana: 0,
+      pokemon: pokemons[selectedPokemon],
       attacks: [
         { name: "Ateş Topu", damage: 20, manaCost: 30 },
         { name: "Yumruk", damage: 10, manaCost: 5 },
@@ -259,6 +273,18 @@
     const enemyPokemon = document.getElementById('enemy-pokemon');
     const playerFlame = document.getElementById('player-flame');
     const enemyFlame = document.getElementById('enemy-flame');
+
+    function changePokemon(index) {
+      selectedPokemon = index;
+      player.pokemon = pokemons[selectedPokemon];
+      player.hp = player.pokemon.hp;
+      player.mana = player.pokemon.mana;
+
+      playerPokemon.src = player.pokemon.image;
+      updateHP();
+      updateMana();
+      log(`${player.name} → Pokémon değiştirildi: ${player.pokemon.name}`);
+    }
 
     function attack(index) {
       if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
@@ -377,25 +403,20 @@
       document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
     }
 
-    function resetGame() {
-      player.hp = 100;
-      enemy.hp = 100;
-      player.mana = 0;
-      enemy.mana = 0;
-      updateHP();
-      updateMana();
-      logDiv.innerHTML = "";
-      document.getElementById('countdown').classList.add('welcome');
-    }
-
     function log(message) {
-      const p = document.createElement('p');
-      p.textContent = message;
-      logDiv.appendChild(p);
+      logDiv.innerHTML += `${message}<br>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
 
-    resetGame();
+    function resetGame() {
+      player.hp = 100;
+      player.mana = 0;
+      enemy.hp = 100;
+      enemy.mana = 0;
+      updateHP();
+      updateMana();
+      log("🆕 Oyun sıfırlandı.");
+    }
   </script>
 </body>
 </html>
