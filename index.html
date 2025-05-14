@@ -10,11 +10,18 @@
       padding: 20px;
       background-color: #f4f4f4;
     }
-    .character {
-      display: inline-block;
-      width: 200px;
-      margin: 20px;
+
+    .character-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
     }
+
+    .character {
+      width: 200px;
+    }
+
     .character img {
       width: 200px;
       height: 250px;
@@ -22,12 +29,12 @@
       background: #eee;
       padding: 5px;
     }
+
     .hp {
       margin: 10px 0;
       font-weight: bold;
     }
 
-    /* 👇 Can barı stilleri */
     .health-bar-container {
       width: 200px;
       height: 20px;
@@ -36,6 +43,7 @@
       border-radius: 5px;
       margin: 5px auto;
     }
+
     .health-bar {
       height: 100%;
       background-color: limegreen;
@@ -52,61 +60,54 @@
       padding: 10px;
       background: #fff;
     }
+
     button {
       padding: 10px 20px;
       margin: 5px;
       font-size: 16px;
     }
-    /* Saldırı animasyonu: ileri-geri sarsılma */
-.attack-animation {
-  animation: attack-shake 0.3s ease;
-}
 
-@keyframes attack-shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(10px); }
-  50% { transform: translateX(-10px); }
-  75% { transform: translateX(5px); }
-  100% { transform: translateX(0); }
-}
+    .attack-animation {
+      animation: attack-shake 0.3s ease;
+    }
+
+    @keyframes attack-shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(10px); }
+      50% { transform: translateX(-10px); }
+      75% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
   </style>
 </head>
 <body>
-<audio id="attack-sound" src="fire.mp3"></audio>
+  <audio id="attack-sound" src="fire.mp3"></audio>
 
   <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
 
-  <div>
+  <div class="character-wrapper">
     <div class="character" id="player-info">
-  <h2>Senin Karakterin</h2>
-  <div style="position: relative;">
-    <img src="sen.png" alt="Sen">
-    <img id="player-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
-  </div> 
-      <div class="health-bar-container">
-  <div id="player-health-bar" class="health-bar"></div>
-</div>
-
-  <div class="hp" id="player-hp">HP: 100</div>
-</div>
-
+      <h2>Senin Karakterin</h2>
+      <div style="position: relative;">
+        <img src="sen.png" alt="Sen">
+        <img id="player-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
       </div>
+      <div class="health-bar-container">
+        <div id="player-health-bar" class="health-bar"></div>
+      </div>
+      <div class="hp" id="player-hp">HP: 100</div>
     </div>
 
-   <div class="character" id="enemy-info">
-  <h2>Rakip Karakter</h2>
-  <div style="position: relative;">
-    <img src="rakip.png" alt="Rakip">
-    <img id="enemy-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
-  </div>
-     <div class="health-bar-container">
-  <div id="enemy-health-bar" class="health-bar"></div>
-</div>
-
-  <div class="hp" id="enemy-hp">HP: 100</div>
-</div>
-
+    <div class="character" id="enemy-info">
+      <h2>Rakip Karakter</h2>
+      <div style="position: relative;">
+        <img src="rakip.png" alt="Rakip">
+        <img id="enemy-fire" src="fire.gif" style="display:none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px;" />
       </div>
+      <div class="health-bar-container">
+        <div id="enemy-health-bar" class="health-bar"></div>
+      </div>
+      <div class="hp" id="enemy-hp">HP: 100</div>
     </div>
   </div>
 
@@ -115,20 +116,19 @@
     <button onclick="attack(0)">Ateş Topu (20 dmg)</button>
     <button onclick="attack(1)">Yumruk (10 dmg)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
-
   </div>
-<div id="countdown" style="font-size: 32px; margin-top: 20px; height: 40px; font-weight: bold; color: #333;"></div>
 
+  <div id="countdown" style="font-size: 32px; margin-top: 20px; height: 40px; font-weight: bold; color: #333;"></div>
   <div class="log" id="log"></div>
 
   <script>
     function showFire(id) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  setTimeout(() => {
-    el.style.display = 'none';
-  }, 500);
-}
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      setTimeout(() => {
+        el.style.display = 'none';
+      }, 500);
+    }
 
     const player = {
       name: "Sen",
@@ -152,17 +152,18 @@
 
     function attack(index) {
       if (player.hp <= 0 || enemy.hp <= 0) return;
-      
-showFire('enemy-fire');
+
+      showFire('enemy-fire');
 
       const atk = player.attacks[index];
-      enemy.hp -= atk.damage;      document.querySelector('#enemy-info img').classList.add('attack-animation');
-setTimeout(() => {
-  document.querySelector('#enemy-info img').classList.remove('attack-animation');
-}, 300);
+      enemy.hp -= atk.damage;
 
-  document.getElementById('attack-sound').play();
+      document.querySelector('#enemy-info img').classList.add('attack-animation');
+      setTimeout(() => {
+        document.querySelector('#enemy-info img').classList.remove('attack-animation');
+      }, 300);
 
+      document.getElementById('attack-sound').play();
       log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
 
@@ -170,18 +171,21 @@ setTimeout(() => {
         log("🎉 Kazandın!");
         return;
       }
- 
+
       setTimeout(enemyTurn, 1000);
     }
 
     function enemyTurn() {
       showFire('player-fire');
+
       const i = Math.floor(Math.random() * enemy.attacks.length);
       const atk = enemy.attacks[i];
-      player.hp -= atk.damage; document.querySelector('#player-info img').classList.add('attack-animation');
-setTimeout(() => {
-  document.querySelector('#player-info img').classList.remove('attack-animation');
-}, 300);
+      player.hp -= atk.damage;
+
+      document.querySelector('#player-info img').classList.add('attack-animation');
+      setTimeout(() => {
+        document.querySelector('#player-info img').classList.remove('attack-animation');
+      }, 300);
 
       log(`${enemy.name} → ${atk.name} → -${atk.damage} HP`);
       updateHP();
@@ -203,7 +207,6 @@ setTimeout(() => {
 
       document.getElementById('player-health-bar').style.backgroundColor =
         playerHP < 30 ? 'red' : (playerHP < 60 ? 'orange' : 'limegreen');
-
       document.getElementById('enemy-health-bar').style.backgroundColor =
         enemyHP < 30 ? 'red' : (enemyHP < 60 ? 'orange' : 'limegreen');
     }
@@ -214,44 +217,41 @@ setTimeout(() => {
       logDiv.appendChild(p);
       logDiv.scrollTop = logDiv.scrollHeight;
     }
+
     function resetGame() {
-  const countdownEl = document.getElementById('countdown');
-  let count = 3;
+      const countdownEl = document.getElementById('countdown');
+      let count = 3;
 
-  countdownEl.textContent = "3...";
-  
-  const countdownInterval = setInterval(() => {
-    count--;
-    if (count > 0) {
-      countdownEl.textContent = count + "...";
-    } else {
-      clearInterval(countdownInterval);
-      countdownEl.textContent = "Dövüş Başladı! 💥";
+      countdownEl.textContent = "3...";
 
-      // Bir süre sonra bu yazıyı da kaldır
-      setTimeout(() => {
-        countdownEl.textContent = "";
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownEl.textContent = count + "...";
+        } else {
+          clearInterval(countdownInterval);
+          countdownEl.textContent = "Dövüş Başladı! 💥";
+
+          setTimeout(() => {
+            countdownEl.textContent = "";
+          }, 1000);
+
+          player.hp = 100;
+          enemy.hp = 100;
+
+          document.getElementById('player-hp').textContent = `HP: 100`;
+          document.getElementById('enemy-hp').textContent = `HP: 100`;
+
+          document.getElementById('player-health-bar').style.width = `100%`;
+          document.getElementById('enemy-health-bar').style.width = `100%`;
+
+          document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
+          document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
+
+          logDiv.innerHTML = '';
+        }
       }, 1000);
-
-      // Oyunu gerçekten sıfırla
-      player.hp = 100;
-      enemy.hp = 100;
-
-      document.getElementById('player-hp').textContent = `HP: 100`;
-      document.getElementById('enemy-hp').textContent = `HP: 100`;
-
-      document.getElementById('player-health-bar').style.width = `100%`;
-      document.getElementById('enemy-health-bar').style.width = `100%`;
-
-      document.getElementById('player-health-bar').style.backgroundColor = 'limegreen';
-      document.getElementById('enemy-health-bar').style.backgroundColor = 'limegreen';
-
-      logDiv.innerHTML = '';
     }
-  }, 1000);
-}
-
-
   </script>
 </body>
 </html>
