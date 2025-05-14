@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-    /* Genel stil ve düzenlemeler */
     body {
       font-family: sans-serif;
       text-align: center;
@@ -14,7 +13,6 @@
       background-position: center;
       color: #fff;
     }
-
     .character-wrapper {
       display: flex;
       justify-content: space-between;
@@ -22,7 +20,6 @@
       gap: 80px;
       margin-top: 50px;
     }
-
     .character {
       width: 200px;
       background-color: rgba(0, 0, 0, 0.6);
@@ -30,11 +27,9 @@
       padding: 10px;
       margin: 10px;
     }
-
     .pokemon-image.tremble {
       animation: tremble 0.1s ease-in-out infinite;
     }
-
     @keyframes tremble {
       0% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
@@ -42,12 +37,10 @@
       75% { transform: translateX(-5px); }
       100% { transform: translateX(5px); }
     }
-
     .hp, .mana {
       margin: 10px 0;
       font-weight: bold;
     }
-
     .health-bar-container, .mana-bar-container {
       width: 200px;
       height: 20px;
@@ -56,7 +49,6 @@
       border-radius: 5px;
       margin: 5px auto;
     }
-
     .health-bar {
       height: 100%;
       background-color: limegreen;
@@ -64,7 +56,6 @@
       border-radius: 5px;
       transition: width 0.3s ease;
     }
-
     .mana-bar {
       height: 100%;
       background-color: lightblue;
@@ -72,7 +63,6 @@
       border-radius: 5px;
       transition: width 0.3s ease;
     }
-
     .log {
       margin-top: 20px;
       height: 100px;
@@ -82,7 +72,6 @@
       background: #fff;
       color: #333;
     }
-
     button {
       padding: 10px 20px;
       margin: 5px;
@@ -93,11 +82,9 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-
     button:hover {
       background-color: #feb47b;
     }
-
     #countdown {
       font-size: 32px;
       margin-top: 20px;
@@ -106,18 +93,15 @@
       color: #ffeb3b;
       transition: all 0.3s;
     }
-
     #countdown.welcome {
       color: limegreen;
       font-size: 36px;
     }
-
     .pokemon-image, .pokemon-image2 {
       width: 250px;
       height: 250px;
       object-fit: contain;
     }
-
     .pokemon-container {
       display: flex;
       justify-content: space-evenly;
@@ -125,7 +109,6 @@
       flex: 1;
       position: relative;
     }
-
     .flame {
       position: absolute;
       top: -30px;
@@ -140,27 +123,23 @@
       pointer-events: none;
       z-index: 2;
     }
-
     @keyframes flameAnimation {
       0% { transform: translateX(-50%) scale(1); }
       50% { transform: translateX(-50%) scale(1.1); }
       100% { transform: translateX(-50%) scale(1); }
     }
-
     .pokemon-switch {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-top: 20px;
     }
-
     .pokemon-switch button {
       background-color: transparent;
       border: 2px solid #ff7e5f;
       padding: 10px;
       cursor: pointer;
     }
-
     .pokemon-switch button img {
       width: 50px;
       height: 50px;
@@ -169,11 +148,15 @@
 </head>
 <body>
   <audio id="attack-sound" src="fire.mp3"></audio>
-
+  
   <h1>🔥 1v1 Sıra Tabanlı Dövüş Oyunu 🔥</h1>
-
-  <div class="character-wrapper">
-    <!-- Senin Karakterin -->
+  
+  <div id="main-menu">
+    <button onclick="startGame()">Oyna</button>
+    <button onclick="changeLanguage()">English</button>
+  </div>
+  
+  <div class="character-wrapper" style="display:none">
     <div class="character" id="player-info">
       <h2>Senin Karakterin</h2>
       <div style="position: relative;">
@@ -191,13 +174,13 @@
 
     <div class="pokemon-container">
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
-      <div class="flame" id="player-flame"></div> <!-- Alev efekti -->
+      <div class="flame" id="player-flame"></div>
       <div style="position: relative; display: inline-block;">
-        <img class="pokemon-image2" id="enemy-pokemon" src="enemy-pokemon.png" alt="Enemy Pokemon" />
+        <img class="pokemon-image2" id="enemy-pokemon" src="pokemon2.png" alt="Enemy Pokemon" />
         <div class="flame" id="enemy-flame"></div>
       </div>
+    </div>
 
-    <!-- Rakip Karakter -->
     <div class="character" id="enemy-info">
       <h2>Rakip Karakter</h2>
       <div style="position: relative;">
@@ -215,7 +198,6 @@
   </div>
 
   <div class="pokemon-switch">
-    <!-- Oyuncu Pokémon Değiştirir -->
     <button onclick="changePlayerPokemon(0)">
       <img src="player-pokemon.png" alt="Pokemon 1" />
     </button>
@@ -226,7 +208,6 @@
       <img src="pokemon3.png" alt="Pokemon 3" />
     </button>
   </div>
-
 
   <div>
     <h3>Saldırı Seç:</h3>
@@ -272,7 +253,6 @@
     const playerFlame = document.getElementById('player-flame');
     const enemyFlame = document.getElementById('enemy-flame');
 
-    // Oyuncu Pokémon Değiştirme
     function changePlayerPokemon(index) {
       if (index === 0) {
         player.pokemon.image = "player-pokemon.png";
@@ -281,10 +261,73 @@
       } else {
         player.pokemon.image = "pokemon3.png";
       }
-
-      playerPokemon.src = player.pokemon.image; // Oyuncunun Pokémon'unu değiştir
+      playerPokemon.src = player.pokemon.image;
     }
 
+    function changeEnemyPokemon(index) {
+      if (index === 0) {
+        enemy.pokemon.image = "pokemon2.png";
+      } else if (index === 1) {
+        enemy.pokemon.image = "pokemon3.png";
+      } else {
+        enemy.pokemon.image = "pokemon4.png";
+      }
+      enemyPokemon.src = enemy.pokemon.image;
+    }
+
+    function attack(index) {
+      if (attackInProgress) return;
+      attackInProgress = true;
+      const attack = player.attacks[index];
+      if (player.mana < attack.manaCost) {
+        logDiv.innerHTML = "Yeterli mananız yok!";
+        attackInProgress = false;
+        return;
+      }
+      player.mana -= attack.manaCost;
+      player.hp -= attack.damage;
+      enemy.hp -= attack.damage;
+      updateBars();
+      logDiv.innerHTML = "Siz " + attack.name + " ile " + attack.damage + " vurduğunuzda.";
+      if (attack.name === "Yumruk") {
+        playerPokemon.style.animation = "tremble 0.2s ease-in-out";
+        setTimeout(() => {
+          playerPokemon.style.animation = "";
+        }, 200);
+      }
+      if (enemy.hp <= 0) {
+        enemy.hp = 0;
+        logDiv.innerHTML = "Rakip Yenildi!";
+      }
+      attackInProgress = false;
+    }
+
+    function updateBars() {
+      document.getElementById('player-health-bar').style.width = (player.hp) + "%";
+      document.getElementById('player-mana-bar').style.width = (player.mana) + "%";
+      document.getElementById('enemy-health-bar').style.width = (enemy.hp) + "%";
+    }
+
+    function resetGame() {
+      player.hp = 100;
+      player.mana = 0;
+      enemy.hp = 100;
+      enemy.mana = 0;
+      updateBars();
+    }
+
+    function startGame() {
+      document.getElementById('main-menu').style.display = "none";
+      document.querySelector('.character-wrapper').style.display = "flex";
+    }
+
+    function changeLanguage() {
+      document.querySelector('html').lang = "en";
+      document.querySelector('h1').textContent = "🔥 1v1 Turn-Based Battle Game 🔥";
+      document.querySelector('#player-info h2').textContent = "Your Character";
+      document.querySelector('#enemy-info h2').textContent = "Enemy Character";
+      document.querySelector('#countdown').textContent = "Game Starts Soon";
+    }
   </script>
 </body>
 </html>
