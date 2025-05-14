@@ -334,6 +334,30 @@
     function resetGame() {
       // Reset the game logic here...
     }
+    // Oyuncu Pokémon Değiştirme Fonksiyonu
+function changePlayerPokemon(index) {
+  if (index === 0) {
+    player.pokemon.image = "player-pokemon.png";
+  } else if (index === 1) {
+    player.pokemon.image = "pokemon2.png";
+  } else {
+    player.pokemon.image = "pokemon3.png";
+  }
+
+  playerPokemon.src = player.pokemon.image; // Oyuncunun Pokémon'unu değiştir
+}
+
+// Rakip Pokémon Değiştirme Fonksiyonu
+function changeEnemyPokemon(index) {
+  if (index === 0) {
+    enemy.pokemon.image = "pokemon2.png";
+  } else if (index === 1) {
+    enemy.pokemon.image = "pokemon3.png";
+  }
+
+  enemyPokemon.src = enemy.pokemon.image; // Rakibin Pokémon'unu değiştir
+}
+
   </script>
 </body>
 </html>
