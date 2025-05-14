@@ -43,6 +43,10 @@
     animation: tremble 0.1s ease-in-out infinite;
   }
 
+  .pokemon-image2.tremble {
+    animation: tremble 0.1s ease-in-out infinite;
+  }
+
   @keyframes tremble {
     0% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -131,6 +135,25 @@
     justify-content: space-evenly;
     align-items: center;
     flex: 1;
+    position: relative;
+  }
+
+  .flame {
+    position: absolute;
+    top: -40px;  /* Pokémon'un kafasının üstüne yerleştirilmiş */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background-image: url('fire.gif');  /* Burada animasyonlu alev gif'ini kullan */
+    background-size: cover;
+    animation: flameAnimation 1s infinite;
+  }
+
+  @keyframes flameAnimation {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
   }
 
   </style>
@@ -159,7 +182,9 @@
 
     <div class="pokemon-container">
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Player Pokemon" />
+      <div class="fire" id="player-fire"></div> <!-- Alev efekti -->
       <img class="pokemon-image2" id="enemy-pokemon" src="enemy-pokemon.png" alt="Enemy Pokemon" />
+      <div class="fire" id="enemy-fire"></div> <!-- Alev efekti -->
     </div>
 
     <!-- Rakip Karakter -->
@@ -199,7 +224,7 @@
       mana: 0,
       attacks: [
         { name: "Ateş Topu", damage: 20, manaCost: 30 },
-        { name: "Yumruk", damage: 10, manaCost: 5 }, // Yumruk artık mana harcıyor
+        { name: "Yumruk", damage: 10, manaCost: 5 },
         { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
       ]
     };
@@ -216,10 +241,10 @@
 
     const logDiv = document.getElementById('log');
     const attackSound = document.getElementById('attack-sound');
-    const playerImage = document.getElementById('player-image');
-    const enemyImage = document.getElementById('enemy-image');
     const playerPokemon = document.getElementById('player-pokemon');
     const enemyPokemon = document.getElementById('enemy-pokemon');
+    const playerFlame = document.getElementById('player-flame');
+    const enemyFlame = document.getElementById('enemy-flame');
 
     function attack(index) {
       if (attackInProgress || player.hp <= 0 || enemy.hp <= 0) return;
@@ -227,7 +252,6 @@
       attackInProgress = true;
 
       if (index === 2) {
-        // Temel saldırı ile mana kazan
         player.mana += player.attacks[index].manaGain;
         log(`${player.name} → Temel Saldırı → +${player.attacks[index].manaGain} Mana`);
       } else {
@@ -237,14 +261,19 @@
           player.mana -= atk.manaCost;
           log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
           playAttackEffect();
-          playerPokemon.classList.add('tremble'); // Pokémon titremesi
-          setTimeout(() => playerPokemon.classList.remove('tremble'), 300); // Titremeyi durdur
+          playerPokemon.classList.add('tremble');
+          enemyPokemon.classList.add('tremble');
+          setTimeout(() => {
+            playerPokemon.classList.remove('tremble');
+            enemyPokemon.classList.remove('tremble');
+          }, 300);
         } else {
           log(`${player.name} → Yeterli Mana Yok!`);
           attackInProgress = false;
           return;
         }
       }
+
       updateHP();
       updateMana();
 
@@ -254,7 +283,7 @@
         return;
       }
 
-      setTimeout(enemyTurn, 1000);  // Rakip sırası arasında 1 saniye bekleme
+      setTimeout(enemyTurn, 1000); 
     }
 
     function enemyTurn() {
@@ -302,7 +331,7 @@
     }
 
     function playAttackEffect() {
-      attackSound.play();  // Ses efekti çal
+      attackSound.play();
     }
 
     function log(message) {
