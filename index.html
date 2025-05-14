@@ -4,157 +4,146 @@
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
   <style>
-  body {
-    font-family: sans-serif;
-    text-align: center;
-    padding: 20px;
-    background-image: url('my_image.jpg');
-    background-size: cover;
-    background-position: center;
-    color: #fff;
-  }
+    /* Genel stil ve düzenlemeler */
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-image: url('my_image.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+    }
 
-  .character-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 80px;
-    margin-top: 50px;
-  }
+    .character-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 80px;
+      margin-top: 50px;
+    }
 
-  .character {
-    width: 200px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 15px;
-    padding: 10px;
-    margin: 10px;
-  }
+    .character {
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 15px;
+      padding: 10px;
+      margin: 10px;
+    }
 
-  .character img {
-    width: 200px;
-    height: 250px;
-    border-radius: 10px;
-    background: #eee;
-    padding: 5px;
-    transition: transform 0.1s ease-in-out;
-  }
+    .pokemon-image.tremble {
+      animation: tremble 0.1s ease-in-out infinite;
+    }
 
-  .pokemon-image.tremble {
-    animation: tremble 0.1s ease-in-out infinite;
-  }
+    @keyframes tremble {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(5px); }
+    }
 
-  .pokemon-image2.tremble {
-    animation: tremble 0.1s ease-in-out infinite;
-  }
+    .hp, .mana {
+      margin: 10px 0;
+      font-weight: bold;
+    }
 
-  @keyframes tremble {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(5px); }
-  }
+    .health-bar-container, .mana-bar-container {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px auto;
+    }
 
-  .hp, .mana {
-    margin: 10px 0;
-    font-weight: bold;
-  }
+    .health-bar {
+      height: 100%;
+      background-color: limegreen;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
 
-  .health-bar-container, .mana-bar-container {
-    width: 200px;
-    height: 20px;
-    background-color: #ddd;
-    border: 1px solid #999;
-    border-radius: 5px;
-    margin: 5px auto;
-  }
+    .mana-bar {
+      height: 100%;
+      background-color: lightblue;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
 
-  .health-bar {
-    height: 100%;
-    background-color: limegreen;
-    width: 100%;
-    border-radius: 5px;
-    transition: width 0.3s ease;
-  }
+    .log {
+      margin-top: 20px;
+      height: 100px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fff;
+      color: #333;
+    }
 
-  .mana-bar {
-    height: 100%;
-    background-color: lightblue;
-    width: 0%;
-    border-radius: 5px;
-    transition: width 0.3s ease;
-  }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      background-color: #ff7e5f;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-  .log {
-    margin-top: 20px;
-    height: 100px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    background: #fff;
-    color: #333;
-  }
+    button:hover {
+      background-color: #feb47b;
+    }
 
-  button {
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 16px;
-    background-color: #ff7e5f;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+    #countdown {
+      font-size: 32px;
+      margin-top: 20px;
+      height: 40px;
+      font-weight: bold;
+      color: #ffeb3b;
+      transition: all 0.3s;
+    }
 
-  button:hover {
-    background-color: #feb47b;
-  }
+    #countdown.welcome {
+      color: limegreen;
+      font-size: 36px;
+    }
 
-  #countdown {
-    font-size: 32px;
-    margin-top: 20px;
-    height: 40px;
-    font-weight: bold;
-    color: #ffeb3b;
-    transition: all 0.3s;
-  }
+    .pokemon-image, .pokemon-image2 {
+      width: 250px;
+      height: 250px;
+      object-fit: contain;
+    }
 
-  #countdown.welcome {
-    color: limegreen;
-    font-size: 36px;
-  }
+    .pokemon-container {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
 
-  .pokemon-image, .pokemon-image2 {
-    width: 250px;
-    height: 250px;
-    object-fit: contain;
-  }
+    .flame {
+      position: absolute;
+      top: -40px;  /* Pokémon'un kafasının üstüne yerleştirilmiş */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background-image: url('fire.gif');  /* Burada animasyonlu alev gif'ini kullan */
+      background-size: cover;
+      animation: flameAnimation 1s infinite;
+      display: none;  /* Başlangıçta görünmesin */
+    }
 
-  .pokemon-container {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    flex: 1;
-    position: relative;
-  }
-
-  .flame {
-    position: absolute;
-    top: -40px;  /* Pokémon'un kafasının üstüne yerleştirilmiş */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 100px;
-    background-image: url('fire.gif');  /* Burada animasyonlu alev gif'ini kullan */
-    background-size: cover;
-    animation: flameAnimation 1s infinite;
-  }
-
-  @keyframes flameAnimation {
-    0% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.1); }
-    100% { transform: translateX(-50%) scale(1); }
-  }
+    @keyframes flameAnimation {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.1); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
 
   </style>
 </head>
@@ -260,7 +249,11 @@
           enemy.hp -= atk.damage;
           player.mana -= atk.manaCost;
           log(`${player.name} → ${atk.name} → -${atk.damage} HP`);
-          playAttackEffect();
+
+          if (atk.name === "Ateş Topu") {
+            enemyFlame.style.display = 'block';  // Ateş topu saldırısı yapıldığında rakip Pokémon'un üstünde alev çıkacak
+          }
+
           playerPokemon.classList.add('tremble');
           enemyPokemon.classList.add('tremble');
           setTimeout(() => {
@@ -330,10 +323,6 @@
       document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
     }
 
-    function playAttackEffect() {
-      attackSound.play();
-    }
-
     function log(message) {
       const p = document.createElement("p");
       p.textContent = message;
@@ -346,6 +335,7 @@
       enemy.hp = 100;
       player.mana = 0;
       enemy.mana = 0;
+      enemyFlame.style.display = 'none';  // Yeniden başlatıldığında alevi gizle
 
       updateHP();
       updateMana();
