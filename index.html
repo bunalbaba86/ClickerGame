@@ -214,29 +214,28 @@
     </div>
   </div>
 
- <!-- Oyuncu Pokémon Değiştirme Butonları -->
-<div class="pokemon-switch">
-  <button onclick="changePlayerPokemon(0)">
-    <img src="player-pokemon.png" alt="Pokemon 1" />
-  </button>
-  <button onclick="changePlayerPokemon(1)">
-    <img src="pokemon2.png" alt="Pokemon 2" />
-  </button>
-  <button onclick="changePlayerPokemon(2)">
-    <img src="pokemon3.png" alt="Pokemon 3" />
-  </button>
-</div>
+  <div class="pokemon-switch">
+    <!-- Oyuncu Pokémon Değiştirir -->
+    <button onclick="changePlayerPokemon(0)">
+      <img src="player-pokemon.png" alt="Pokemon 1" />
+    </button>
+    <button onclick="changePlayerPokemon(1)">
+      <img src="pokemon2.png" alt="Pokemon 2" />
+    </button>
+    <button onclick="changePlayerPokemon(2)">
+      <img src="pokemon3.png" alt="Pokemon 3" />
+    </button>
+  </div>
 
-<!-- Rakip Pokémon Değiştirme Butonları (Kendi iradesiyle)-->
-<div class="pokemon-switch">
-  <button onclick="changeEnemyPokemon(0)">
-    <img src="pokemon2.png" alt="Enemy Pokemon 1" />
-  </button>
-  <button onclick="changeEnemyPokemon(1)">
-    <img src="pokemon3.png" alt="Enemy Pokemon 2" />
-  </button>
-</div>
-
+  <!-- Rakip Pokémon Değiştirme Butonları (Sadece rakip için) -->
+  <div class="pokemon-switch">
+    <button onclick="changeEnemyPokemon(0)">
+      <img src="pokemon2.png" alt="Enemy Pokemon 1" />
+    </button>
+    <button onclick="changeEnemyPokemon(1)">
+      <img src="pokemon3.png" alt="Enemy Pokemon 2" />
+    </button>
+  </div>
 
   <div>
     <h3>Saldırı Seç:</h3>
@@ -282,82 +281,29 @@
     const playerFlame = document.getElementById('player-flame');
     const enemyFlame = document.getElementById('enemy-flame');
 
-    function changePokemon(index) {
+    // Oyuncu Pokémon Değiştirme
+    function changePlayerPokemon(index) {
       if (index === 0) {
         player.pokemon.image = "player-pokemon.png";
-        enemy.pokemon.image = "enemy-pokemon2.png";
       } else if (index === 1) {
         player.pokemon.image = "pokemon2.png";
-        enemy.pokemon.image = "enemy-pokemon.png";
       } else {
         player.pokemon.image = "pokemon3.png";
-        enemy.pokemon.image = "enemy-pokemon.png";
       }
 
-      playerPokemon.src = player.pokemon.image;
-      enemyPokemon.src = enemy.pokemon.image;
+      playerPokemon.src = player.pokemon.image; // Oyuncunun Pokémon'unu değiştir
     }
 
-    function attack(index) {
-      // Attack logic here...
+    // Rakip Pokémon Değiştirme
+    function changeEnemyPokemon(index) {
+      if (index === 0) {
+        enemy.pokemon.image = "pokemon2.png";
+      } else {
+        enemy.pokemon.image = "pokemon3.png";
+      }
+
+      enemyPokemon.src = enemy.pokemon.image; // Rakibin Pokémon'unu değiştir
     }
-
-    function updateHP() {
-      const playerHP = Math.max(0, player.hp);
-      const enemyHP = Math.max(0, enemy.hp);
-
-      document.getElementById('player-hp').textContent = `HP: ${playerHP}`;
-      document.getElementById('enemy-hp').textContent = `HP: ${enemyHP}`;
-
-      document.getElementById('player-health-bar').style.width = `${playerHP}%`;
-      document.getElementById('enemy-health-bar').style.width = `${enemyHP}%`;
-    }
-
-    function updateMana() {
-      const playerMana = Math.max(0, player.mana);
-      const enemyMana = Math.max(0, enemy.mana);
-
-      document.getElementById('player-mana').textContent = playerMana;
-      document.getElementById('enemy-mana').textContent = enemyMana;
-
-      document.getElementById('player-mana-bar').style.width = `${playerMana}%`;
-      document.getElementById('enemy-mana-bar').style.width = `${enemyMana}%`;
-    }
-
-    function log(message) {
-      const p = document.createElement("p");
-      p.textContent = message;
-      logDiv.appendChild(p);
-      logDiv.scrollTop = logDiv.scrollHeight;
-    }
-
-    function resetGame() {
-      // Reset the game logic here...
-    }
-    // Oyuncu Pokémon Değiştirme Fonksiyonu
-function changePlayerPokemon(index) {
-  if (index === 0) {
-    player.pokemon.image = "player-pokemon.png";
-  } else if (index === 1) {
-    player.pokemon.image = "pokemon2.png";
-  } else {
-    player.pokemon.image = "pokemon3.png";
-  }
-
-  playerPokemon.src = player.pokemon.image; // Oyuncunun Pokémon'unu değiştir
-}
-
-// Rakip Pokémon Değiştirme Fonksiyonu
-function changeEnemyPokemon(index) {
-  if (index === 0) {
-    enemy.pokemon.image = "pokemon2.png";
-  } else if (index === 1) {
-    enemy.pokemon.image = "pokemon3.png";
-  }
-
-  enemyPokemon.src = enemy.pokemon.image; // Rakibin Pokémon'unu değiştir
-}
-
   </script>
 </body>
 </html>
