@@ -108,7 +108,6 @@
     font-size: 36px;
   }
 </style>
-
 </head>
 <body>
   <audio id="attack-sound" src="fire.mp3"></audio>
@@ -202,7 +201,7 @@
         return;
       }
 
-      setTimeout(enemyTurn, 1000);
+      setTimeout(enemyTurn, 1000);  // Rakip sırası arasında 1 saniye bekleme
     }
 
     function enemyTurn() {
