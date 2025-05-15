@@ -19,6 +19,7 @@
       align-items: center;
       gap: 80px;
       margin-top: 50px;
+      display: none;
     }
     .character {
       width: 200px;
@@ -54,6 +55,9 @@
       border-radius: 5px;
       transition: width 0.3s ease;
     }
+    .health-bar {
+      background-color: limegreen;
+    }
     .mana-bar {
       background-color: deepskyblue;
     }
@@ -81,6 +85,8 @@
       font-size: 2rem;
       animation: hit 0.5s ease-out forwards;
       pointer-events: none;
+      color: yellow;
+      font-weight: bold;
     }
     @keyframes hit {
       0% { opacity: 1; transform: translate(-50%, -20px); }
@@ -99,6 +105,16 @@
       opacity: 0.4;
       cursor: not-allowed;
     }
+    #fire-effect {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      display: none;
+      pointer-events: none;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
@@ -108,10 +124,10 @@
     <button onclick="startGame()">Oyna</button>
   </div>
 
-  <div class="character-wrapper" style="display:none">
+  <div class="character-wrapper">
     <div class="character" id="player-info">
       <h2>Senin Karakterin</h2>
-      <img src="sen.png" alt="Sen" id="player-image">
+      <img src="sen.png" alt="Sen" id="player-image" />
       <div class="bar-container"><div id="player-health-bar" class="health-bar"></div></div>
       <div class="bar-container"><div id="player-mana-bar" class="mana-bar"></div></div>
       <div class="hp" id="player-hp">HP: 100</div>
@@ -122,11 +138,12 @@
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Senin Pokemonun" />
       <div class="attack-effect" id="attack-effect"></div>
       <img class="pokemon-image" id="enemy-pokemon" src="enemy-pokemon2.png" alt="Rakip Pokemon" />
+      <img id="fire-effect" src="fire.gif" alt="Fire Effect" />
     </div>
 
     <div class="character" id="enemy-info">
       <h2>Rakip Karakter</h2>
-      <img src="rakip.png" alt="Rakip" id="enemy-image">
+      <img src="rakip.png" alt="Rakip" id="enemy-image" />
       <div class="bar-container"><div id="enemy-health-bar" class="health-bar"></div></div>
       <div class="bar-container"><div id="enemy-mana-bar" class="mana-bar"></div></div>
       <div class="hp" id="enemy-hp">HP: 100</div>
@@ -135,9 +152,9 @@
   </div>
 
   <div class="pokemon-switch">
-    <button onclick="changePlayerPokemon(0)"><img src="player-pokemon.png" /></button>
-    <button onclick="changePlayerPokemon(1)"><img src="pokemon2.png" /></button>
-    <button onclick="changePlayerPokemon(2)"><img src="pokemon3.png" /></button>
+    <button onclick="changePlayerPokemon(0)"><img src="player-pokemon.png" alt="Pokemon 1" /></button>
+    <button onclick="changePlayerPokemon(1)"><img src="pokemon2.png" alt="Pokemon 2" /></button>
+    <button onclick="changePlayerPokemon(2)"><img src="pokemon3.png" alt="Pokemon 3" /></button>
   </div>
 
   <div>
@@ -149,6 +166,8 @@
   </div>
 
   <div id="log" class="log"></div>
+
+  <audio id="fire-sound" src="fire.mp3"></audio>
 
   <script>
     let attackInProgress = false;
@@ -194,6 +213,8 @@
 
     const logDiv = document.getElementById('log');
     const attackEffect = document.getElementById('attack-effect');
+    const fireEffect = document.getElementById('fire-effect');
+    const fireSound = document.getElementById('fire-sound');
 
     function changePlayerPokemon(index) {
       const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
@@ -243,6 +264,7 @@
       document.querySelector('.character-wrapper').style.display = "flex";
       document.getElementById('enemy-pokemon').src = enemy.image;
       updateBars();
+      logDiv.textContent = "Oyun başladı! Saldırını seç.";
     }
 
     function resetGame() {
@@ -306,6 +328,15 @@
 
       // Saldırı
       enemy.hp -= atk.damage;
+
+      if (atk.name === "Alev Topu") {
+        fireEffect.style.display = "block";
+        fireSound.currentTime = 0;
+        fireSound.play();
+        setTimeout(() => {
+          fireEffect.style.display = "none";
+        }, 600);
+      }
 
       if (enemy.hp <= 0) {
         enemy.hp = 0;
