@@ -401,8 +401,9 @@ function attack(attackIndex) {
   if (attackData.manaGain) player.mana = Math.min(player.mana + attackData.manaGain, 50);
 
   const isCritical = Math.random() < 0.25;
-  if (isCritical) showCriticalFlash();
   const damage = (attackData.damage || 0) * (isCritical ? 2 : 1);
+  if (isCritical) showCriticalFlash();
+  
 
   if (damage > 0) {
     enemy.hp -= damage;
