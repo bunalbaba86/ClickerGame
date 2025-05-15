@@ -401,8 +401,9 @@ function attack(attackIndex) {
   if (attackData.manaGain) player.mana = Math.min(player.mana + attackData.manaGain, 50);
 
   const isCritical = Math.random() < 0.25;
-  const damage = (attackData.damage || 0) * (isCritical ? 2 : 1);
   if (isCritical) showCriticalFlash();
+  const damage = (attackData.damage || 0) * (isCritical ? 2 : 1);
+  
   
 
   if (damage > 0) {
@@ -489,8 +490,11 @@ function enemyTurn() {
 
   enemy.mana -= attackData.manaCost;
 
-  const isCritical = Math.random() < 0.2;
-  let damage = attackData.damage * (isCritical ? 2 : 1);
+ const isCritical = Math.random() < 0.2;
+ if (isCritical) showCriticalFlash();
+
+ let damage = attackData.damage * (isCritical ? 2 : 1);
+
 
   if (player.defenseActive) {
     damage = Math.ceil(damage * 0.1);
