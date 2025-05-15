@@ -123,7 +123,12 @@
 
 .dash {
   animation: dash-forward 0.3s ease-out;
+} 
+@keyframes damageFlash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2); }
 }
+
 
   </style>
 </head>
@@ -178,6 +183,9 @@
   <div id="log" class="log"></div>
 
   <audio id="fire-sound" src="fire.mp3"></audio>
+  <audio id="punch-sound" src="punch.mp3"></audio>
+<audio id="basic-sound" src="basic.mp3"></audio>
+
 
   <script>
     let attackInProgress = false;
@@ -289,12 +297,13 @@
       updateBars();
     }
 
-    function showEffect(text) {
-      attackEffect.textContent = text;
-      attackEffect.style.animation = "none";
-      void attackEffect.offsetWidth; // restart animation
-      attackEffect.style.animation = "hit 0.5s ease-out forwards";
-    }
+  function showEffect(text, color = "yellow") {
+  attackEffect.textContent = text;
+  attackEffect.style.color = color;
+  attackEffect.style.animation = "none";
+  void attackEffect.offsetWidth;
+  attackEffect.style.animation = "hit 0.5s ease-out forwards";
+}
 
     function enableAttacks(enabled) {
       document.querySelectorAll('.attack-button').forEach(btn => {
@@ -352,6 +361,18 @@
   playerPokemon.classList.add('dash');
   setTimeout(() => playerPokemon.classList.remove('dash'), 300);
 }
+      if (atk.name === "Yumruk") {
+  document.getElementById("punch-sound").play();
+}
+if (atk.name === "Temel Saldırı") {
+  document.getElementById("basic-sound").play();
+}
+
+      document.getElementById('enemy-pokemon').style.animation = "damageFlash 0.3s ease";
+setTimeout(() => {
+  document.getElementById('enemy-pokemon').style.animation = "";
+}, 300);
+
 
 
       if (enemy.hp <= 0) {
@@ -371,6 +392,19 @@
       // Rakibin saldırısı 1 saniye sonra
       setTimeout(enemyAttack, 1000);
     }
+    // Saldırı
+let isCritical = Math.random() < 0.2; // %20 kritik ihtimali
+let finalDamage = atk.damage;
+
+if (isCritical) {
+  finalDamage *= 2;
+  showEffect("KRİTİK! -" + finalDamage + " HP", "red");
+} else {
+  showEffect(atk.name + " -" + finalDamage + " HP", "yellow");
+}
+
+enemy.hp -= finalDamage;
+
 
     function enemyAttack() {
       if (gameOver) return;
