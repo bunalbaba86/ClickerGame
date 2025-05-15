@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>1v1 Dövüş Oyunu</title>
+
   <style>
     body {
       font-family: sans-serif;
@@ -187,6 +188,22 @@
       font-size: 20px;
       color: white;
     }
+    .attack-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  object-fit: cover;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+.attack-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
   </style>
 </head>
 <body>
@@ -232,10 +249,23 @@
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button onclick="attack(0)" class="attack-button">Alev Topu (20 dmg, 30 mana)</button>
-    <button onclick="attack(1)" class="attack-button">Yumruk (10 dmg, 5 mana)</button>
-    <button onclick="attack(2)" class="attack-button">Temel Saldırı (+10 Mana)</button>
-    <button onclick="useDefense()" class="attack-button">Defans Büyüsü (%90 hasar azaltır, 20 mana)</button>
+    <button onclick="attack(0)">
+  <img src="fireball.jpg" class="attack-icon" />
+  Alev Topu
+</button>
+<button onclick="attack(1)">
+  <img src="punch.jpg" class="attack-icon" />
+  Yumruk
+</button>
+<button onclick="attack(2)">
+  <img src="basic.png" class="attack-icon" />
+  Temel Saldırı
+</button>
+<button onclick="useDefense()">
+  <img src="shield.jpg" class="attack-icon" />
+  Defans Büyüsü
+</button>
+
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
