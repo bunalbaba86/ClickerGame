@@ -86,6 +86,19 @@
       0% { opacity: 1; transform: translate(-50%, -20px); }
       100% { opacity: 0; transform: translate(-50%, -60px); }
     }
+    .log {
+      margin-top: 20px;
+      min-height: 50px;
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -129,8 +142,8 @@
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button onclick="attack(0)" class="attack-button">Alev Topu (20 dmg)</button>
-    <button onclick="attack(1)" class="attack-button">Yumruk (10 dmg)</button>
+    <button onclick="attack(0)" class="attack-button">Alev Topu (20 dmg, 30 mana)</button>
+    <button onclick="attack(1)" class="attack-button">Yumruk (10 dmg, 5 mana)</button>
     <button onclick="attack(2)" class="attack-button">Temel Saldırı (+10 Mana)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
@@ -148,7 +161,7 @@
       attacks: [
         { name: "Alev Topu", damage: 20, manaCost: 30 },
         { name: "Yumruk", damage: 10, manaCost: 5 },
-        { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
+        { name: "Temel Saldırı", damage: 0, manaCost: 0, manaGain: 10 }
       ]
     };
 
@@ -215,8 +228,14 @@
 
       document.getElementById('player-hp').textContent = `HP: ${safePlayerHP}`;
       document.getElementById('enemy-hp').textContent = `HP: ${safeEnemyHP}`;
-      document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
-      document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
+      document.getElementById('player-mana').textContent = `Mana: ${Math.floor(player.mana)}`;
+      document.getElementById('enemy-mana').textContent = `Mana: ${Math.floor(enemy.mana)}`;
+
+      // Saldırı butonlarının mana durumuna göre etkinlik kontrolü
+      document.querySelectorAll('.attack-button').forEach((btn, i) => {
+        const atk = player.attacks[i];
+        btn.disabled = gameOver || player.mana < atk.manaCost;
+      });
     }
 
     function startGame() {
@@ -233,15 +252,15 @@
       enemy = { ...enemyPokemons[currentEnemyIndex] };
       gameOver = false;
       document.getElementById('enemy-pokemon').src = enemy.image;
-      updateBars();
       logDiv.textContent = "";
       enableAttacks(true);
+      updateBars();
     }
 
     function showEffect(text) {
       attackEffect.textContent = text;
       attackEffect.style.animation = "none";
-      void attackEffect.offsetWidth;
+      void attackEffect.offsetWidth; // restart animation
       attackEffect.style.animation = "hit 0.5s ease-out forwards";
     }
 
@@ -278,13 +297,14 @@
         return;
       }
 
+      // Mana kullanımı ve kazanımı
       player.mana -= atk.manaCost;
-
       if (atk.manaGain) {
         player.mana += atk.manaGain;
         if (player.mana > 100) player.mana = 100;
       }
 
+      // Saldırı
       enemy.hp -= atk.damage;
 
       if (enemy.hp <= 0) {
@@ -301,13 +321,16 @@
       logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
       showEffect(atk.name);
 
+      // Rakibin saldırısı 1 saniye sonra
       setTimeout(enemyAttack, 1000);
     }
 
     function enemyAttack() {
       if (gameOver) return;
 
-      const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
+      // Mana yeterli en güçlü saldırıyı seç, yoksa diğer saldırı
+      let atk = enemy.attacks.find(a => enemy.mana >= a.manaCost);
+      if (!atk) atk = enemy.attacks[0]; // Mana yetmese bile bir saldırı yapabilir
 
       if (enemy.mana >= atk.manaCost) {
         enemy.mana -= atk.manaCost;
