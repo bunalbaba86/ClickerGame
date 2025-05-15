@@ -86,7 +86,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 2rem;
-    animation: hit 1s ease-out forwards;
+    animation: hit 2s ease-out forwards;
     pointer-events: none;
     color: yellow;
     font-weight: bold;
@@ -95,7 +95,9 @@
   @keyframes hit {
     0% { opacity: 1; transform: translate(-50%, -20px); }
     100% { opacity: 0; transform: translate(-50%, -60px); }
-  }
+  } 
+  
+
   .log {
     margin-top: 20px;
     min-height: 50px;
@@ -401,7 +403,7 @@ function attack(attackIndex) {
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
   attackEffect.style.left = "35%";
-  attackEffect.style.top = "120px";
+  attackEffect.style.top = "60px";
   attackEffect.style.display = "block";
 
   attackEffect.style.animation = "none";
