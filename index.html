@@ -395,7 +395,7 @@ function attack(attackIndex) {
   showLog(`You used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const enemyPokemonImg = document.getElementById("enemy-pokemon");
-  enemyPokemonImg.classList.add("recoil");
+  enemyPokemonImg.classList.add("dash");
 
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
@@ -415,7 +415,7 @@ function attack(attackIndex) {
   }
 
   setTimeout(() => {
-    enemyPokemonImg.classList.remove("recoil");
+    enemyPokemonImg.classList.remove("dash");
     attackEffect.style.display = "none";
     fireEffect.style.display = "none";
 
