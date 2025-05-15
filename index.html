@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>1v1 Dövüş Oyunu</title>
+  <title>Kryptomon Battle</title>
 
   <style>
     body {
@@ -207,11 +207,12 @@
   </style>
 </head>
 <body>
-  <h1>🔥 1v1 Dövüş Oyunu 🔥</h1>
+  <h1>🔥 KRYPTOMON BATTLE🔥</h1>
 
-  <div id="main-menu">
-    <button onclick="startGame()">Oyna</button>
-  </div>
+<div id="main-menu">
+  <button onclick="startGame()">START</button>
+</div>
+
 
   <div class="character-wrapper">
     <div class="character" id="player-info">
@@ -248,35 +249,37 @@
   </div>
 
   <div>
-    <h3>Saldırı Seç:</h3>
-    <button onclick="attack(0)">
-  <img src="fireball.jpg" class="attack-icon" />
-  Alev Topu
-</button>
-<button onclick="attack(1)">
-  <img src="punch.jpg" class="attack-icon" />
-  Yumruk
-</button>
-<button onclick="attack(2)">
-  <img src="basic.png" class="attack-icon" />
-  Temel Saldırı
-</button>
-<button onclick="useDefense()">
-  <img src="shield.jpg" class="attack-icon" />
-  Defans Büyüsü
-</button>
+    <div>
+  <h3>Choose Your Attack:</h3>
+  <button onclick="attack(0)">
+    <img src="fireball.jpg" class="attack-icon" />
+    Fireball
+  </button>
+  <button onclick="attack(1)">
+    <img src="punch.jpg" class="attack-icon" />
+    Punch
+  </button>
+  <button onclick="attack(2)">
+    <img src="basic.png" class="attack-icon" />
+    Basic Attack
+  </button>
+  <button onclick="useDefense()">
+    <img src="shield.jpg" class="attack-icon" />
+    Defense Spell
+  </button>
 
-    <button onclick="resetGame()">🔄 Yeniden Başlat</button>
-  </div>
+  <button onclick="resetGame()">🔄 Restart</button>
+</div>
 
   <div id="log" class="log"></div>
 
-  <!-- İstatistik ekranı -->
-  <div id="stats-screen">
-    <h2>Oyun İstatistikleri</h2>
-    <div id="stats-content"></div>
-    <button onclick="closeStats()">Kapat ve Yeniden Başlat</button>
-  </div>
+  <!-- Statistics Screen -->
+<div id="stats-screen">
+  <h2>Game Statistics</h2>
+  <div id="stats-content"></div>
+  <button onclick="closeStats()">Close and Restart</button>
+</div>
+
 
   <audio id="fire-sound" src="fire.mp3"></audio>
   <audio id="punch-sound" src="punch.mp3"></audio>
@@ -379,7 +382,7 @@ function attack(attackIndex) {
   if (attackInProgress || gameOver) return;
   const attackData = player.attacks[attackIndex];
   if (player.mana < (attackData.manaCost || 0)) {
-    showLog("Yeterli manan yok!");
+    showLog("Not enough mana!");
     return;
   }
 
@@ -403,7 +406,7 @@ function attack(attackIndex) {
 
   attacksUsed[attackData.name]++;
 
-  showLog(`Sen ${attackData.name} kullandın!${isCritical ? " KRİTİK VURUŞ!" : ""}`, isCritical);
+  showLog(`You used ${attackData.name} !${isCritical ? "CRITICAL HIT!" : ""}`, isCritical);
 
   const enemyPokemonImg = document.getElementById("enemy-pokemon");
   enemyPokemonImg.classList.add("dash");
@@ -444,7 +447,7 @@ function useDefense() {
   if (attackInProgress || gameOver) return;
   const defenseManaCost = 20;
   if (player.mana < defenseManaCost) {
-    showLog("Yeterli manan yok!");
+    showLog("Not enough mana!");
     return;
   }
   attackInProgress = true;
@@ -454,7 +457,7 @@ function useDefense() {
   player.defenseActive = true;
   player.defenseTurnsLeft = 1;
 
-  showLog("Defans Büyüsü aktif! Gelen hasar %90 azaltılacak.");
+  showLog("Defense Spell is active! Incoming damage will be reduced by 90%.");
 
   // Defans büyüsü için görsel efekt (ikonu zaten gösteriliyor)
   updateBars();
@@ -471,7 +474,7 @@ function enemyTurn() {
   const possibleAttacks = enemy.attacks.filter(a => a.manaCost <= enemy.mana);
   if (possibleAttacks.length === 0) {
     enemy.mana = Math.min(enemy.mana + 10, 50);
-    showLog("Rakip mana topluyor...");
+    showLog("Enemy is gathering mana...");
     updateBars();
     attackInProgress = false;
     return;
@@ -491,7 +494,7 @@ function enemyTurn() {
     player.defenseTurnsLeft--;
     if (player.defenseTurnsLeft <= 0) {
       player.defenseActive = false;
-      showLog("Defans Büyüsü etkisi sona erdi.");
+      showLog("The Defense Spell effect has ended.");
     }
     updateBars();
   }
@@ -501,7 +504,7 @@ function enemyTurn() {
 
   enemyAttacksUsed[attackData.name] = (enemyAttacksUsed[attackData.name] || 0) + 1;
 
-  showLog(`Rakip ${attackData.name} kullandı!${isCritical ? " KRİTİK VURUŞ!" : ""}`, isCritical);
+  showLog(`Enemy used ${attackData.name} !${isCritical ? "CRITICAL HIT!" : ""}`, isCritical);
 
   const playerPokemonImg = document.getElementById("player-pokemon");
   playerPokemonImg.classList.add("dash");
@@ -532,9 +535,9 @@ function endGame(playerWon) {
   gameOver = true;
   const log = document.getElementById("log");
   if (playerWon) {
-    showLog("Tebrikler, kazandın!");
+    showLog("Congratulations, You Won!");
   } else {
-    showLog("Kaybettin! Tekrar dene.");
+    showLog("You Lose, TryAgain!");
   }
   showStats(playerWon);
 }
