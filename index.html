@@ -79,11 +79,11 @@
     }
     .attack-effect {
       position: absolute;
-      top: 80px;
+      top: 120px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 2rem;
-      animation: hit 0.5s ease-out forwards;
+      animation: hit 1s ease-out forwards;
       pointer-events: none;
       color: yellow;
       font-weight: bold;
@@ -377,9 +377,9 @@
       attackEffect.style.color = isCritical ? "red" : "yellow";
       attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
       attackEffect.style.left = "35%";
-      attackEffect.style.top = "80px";
+      attackEffect.style.top = "120px";
       attackEffect.style.display = "block";
-      attackEffect.style.animation = "hit 0.5s ease-out forwards";
+      attackEffect.style.animation = "hit 1s ease-out forwards";
 
       if (attackData.name === "Alev Topu") {
         fireEffect.style.display = "block";
