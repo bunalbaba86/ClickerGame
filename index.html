@@ -31,6 +31,7 @@
       width: 250px;
       height: 250px;
       object-fit: contain;
+      position: relative;
     }
     .pokemon-container {
       display: flex;
@@ -79,9 +80,28 @@
       animation: hit 0.5s ease-out forwards;
       pointer-events: none;
     }
+    #fire-effect {
+      position: absolute;
+      top: 50%;
+      left: 75%;
+      width: 100px;
+      height: 100px;
+      display: none;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
     @keyframes hit {
       0% { opacity: 1; transform: translate(-50%, -20px); }
       100% { opacity: 0; transform: translate(-50%, -60px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+      25% { transform: translate(-50%, -50%) translateX(-5px); }
+      75% { transform: translate(-50%, -50%) translateX(5px); }
+    }
+    #fire-effect.shake {
+      animation: shake 0.5s infinite;
     }
   </style>
 </head>
@@ -105,6 +125,8 @@
       <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Senin Pokemonun" />
       <div class="attack-effect" id="attack-effect"></div>
       <img class="pokemon-image" id="enemy-pokemon" src="enemy-pokemon2.png" alt="Rakip Pokemon" />
+      <img src="fire.gif" id="fire-effect" alt="Alev Efekti" />
+      <audio id="fire-sound" src="fire.mp3" preload="auto"></audio>
     </div>
 
     <div class="character" id="enemy-info">
@@ -182,6 +204,8 @@
 
   const logDiv = document.getElementById('log');
   const attackEffect = document.getElementById('attack-effect');
+  const fireEffect = document.getElementById('fire-effect');
+  const fireSound = document.getElementById('fire-sound');
 
   function changePlayerPokemon(index) {
     const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
@@ -246,6 +270,11 @@
     }
   }
 
+  function attackAnimation(callback) {
+    // Basit animasyon için delay, attackEffect ile beraber kullanabiliriz.
+    setTimeout(callback, 600);
+  }
+
   function attack(index) {
     if (attackInProgress || gameOver) return;
     attackInProgress = true;
@@ -257,30 +286,53 @@
       return;
     }
 
-    player.mana -= atk.manaCost;
-
-    if (atk.manaGain) {
-      player.mana += atk.manaGain;
-      if (player.mana > 100) player.mana = 100;
+    // Alev Topu saldırısı ise efektleri göster
+    if (atk.name === "Alev Topu") {
+      fireEffect.style.display = 'block';
+      fireEffect.classList.add('shake');
+      fireSound.currentTime = 0;
+      fireSound.play();
     }
 
-    enemy.hp -= atk.damage;
+    attackAnimation(() => {
+      player.mana -= atk.manaCost;
 
-    if (enemy.hp <= 0) {
-      enemy.hp = 0;
-      logDiv.textContent = "Rakip Pokémon bayıldı!";
-      showEffect("KO!");
+      if (atk.manaGain) {
+        player.mana += atk.manaGain;
+        if (player.mana > 100) player.mana = 100;
+      }
+
+      enemy.hp -= atk.damage;
+
+      if (enemy.hp <= 0) {
+        enemy.hp = 0;
+        logDiv.textContent = "Rakip Pokémon bayıldı!";
+        showEffect("KO!");
+        updateBars();
+
+        // Efekti gizle
+        if (atk.name === "Alev Topu") {
+          fireEffect.style.display = 'none';
+          fireEffect.classList.remove('shake');
+        }
+
+        setTimeout(nextEnemyPokemon, 1000);
+        attackInProgress = false;
+        return;
+      }
+
       updateBars();
-      setTimeout(nextEnemyPokemon, 1000);
-      attackInProgress = false;
-      return;
-    }
+      logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
+      showEffect(atk.name);
 
-    updateBars();
-    logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
-    showEffect(atk.name);
+      // Efekti gizle
+      if (atk.name === "Alev Topu") {
+        fireEffect.style.display = 'none';
+        fireEffect.classList.remove('shake');
+      }
 
-    setTimeout(enemyAttack, 1000);
+      setTimeout(enemyAttack, 1000);
+    });
   }
 
   function enemyAttack() {
@@ -309,6 +361,6 @@
 
     attackInProgress = false;
   }
-</script>
+  </script>
 </body>
 </html>
