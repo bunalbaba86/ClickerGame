@@ -475,8 +475,8 @@ function useDefense() {
 }
 
 function enemyTurn() {
-  if (isCritical) showCriticalFlash();
   if (gameOver) return;
+
   const possibleAttacks = enemy.attacks.filter(a => a.manaCost <= enemy.mana);
   if (possibleAttacks.length === 0) {
     enemy.mana = Math.min(enemy.mana + 10, 50);
@@ -487,14 +487,13 @@ function enemyTurn() {
   }
 
   const attackData = possibleAttacks[Math.floor(Math.random() * possibleAttacks.length)];
-
   enemy.mana -= attackData.manaCost;
 
- const isCritical = Math.random() < 0.2;
- if (isCritical) showCriticalFlash();
+  // ❗ ÖNCE isCritical TANIMLANIR
+  const isCritical = Math.random() < 0.2;
+  if (isCritical) showCriticalFlash();
 
- let damage = attackData.damage * (isCritical ? 2 : 1);
-
+  let damage = attackData.damage * (isCritical ? 2 : 1);
 
   if (player.defenseActive) {
     damage = Math.ceil(damage * 0.1);
@@ -514,29 +513,32 @@ function enemyTurn() {
   showLog(`Enemy used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const playerPokemonImg = document.getElementById("player-pokemon");
-  playerPokemonImg.classList.add("recoil");
-
+  const rect = playerPokemonImg.getBoundingClientRect();
+  attackEffect.style.left = `${rect.left + rect.width / 2}px`;
+  attackEffect.style.top = `${rect.top - 30}px`;
+  attackEffect.style.display = "block";
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = `-${damage}`;
-  attackEffect.style.left = "65%";
-  attackEffect.style.top = "120px";
-  attackEffect.style.display = "block";
-
   attackEffect.style.animation = "none";
   attackEffect.offsetHeight;
-  attackEffect.style.animation = "hit 0.5s ease-out forwards";
+  attackEffect.style.animation = "hit 1.8s ease-out forwards";
+
+  playerPokemonImg.classList.add("recoil");
 
   setTimeout(() => {
     playerPokemonImg.classList.remove("recoil");
     attackEffect.style.display = "none";
     updateBars();
+
     if (player.hp <= 0) {
       endGame(false);
       return;
     }
+
     attackInProgress = false;
   }, 700);
 }
+
 
 function endGame(playerWon) {
   gameOver = true;
