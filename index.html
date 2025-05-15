@@ -133,151 +133,182 @@
   <div id="log" class="log"></div>
 
   <script>
-    let attackInProgress = false;
-    let gameOver = false;
+  let attackInProgress = false;
+  let gameOver = false;
 
-    const player = {
+  const player = {
+    hp: 100,
+    mana: 50,
+    pokemon: { image: "player-pokemon.png" },
+    attacks: [
+      { name: "Alev Topu", damage: 20, manaCost: 30 },
+      { name: "Yumruk", damage: 10, manaCost: 5 },
+      { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
+    ]
+  };
+
+  const enemyPokemons = [
+    {
       hp: 100,
       mana: 50,
-      pokemon: { image: "player-pokemon.png" },
-      attacks: [
-        { name: "Alev Topu", damage: 20, manaCost: 30 },
-        { name: "Yumruk", damage: 10, manaCost: 5 },
-        { name: "Temel Saldırı", damage: 1, manaCost: 0, manaGain: 10 }
-      ]
-    };
-
-    const enemy = {
-      hp: 100,
-      mana: 50,
-      pokemon: { image: "pokemon2.png" },
+      image: "enemy-pokemon1.png",
       attacks: [
         { name: "Isırık", damage: 15, manaCost: 20 },
         { name: "Zehir", damage: 12, manaCost: 10 }
       ]
-    };
-
-    const logDiv = document.getElementById('log');
-    const attackEffect = document.getElementById('attack-effect');
-
-    function changePlayerPokemon(index) {
-      const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
-      player.pokemon.image = images[index];
-      document.getElementById('player-pokemon').src = player.pokemon.image;
+    },
+    {
+      hp: 100,
+      mana: 50,
+      image: "enemy-pokemon2.png",
+      attacks: [
+        { name: "Pençe", damage: 13, manaCost: 15 },
+        { name: "Tırmalama", damage: 9, manaCost: 5 }
+      ]
+    },
+    {
+      hp: 100,
+      mana: 50,
+      image: "enemy-pokemon3.png",
+      attacks: [
+        { name: "Ateş Hapsi", damage: 17, manaCost: 25 },
+        { name: "Kıvılcım", damage: 10, manaCost: 10 }
+      ]
     }
+  ];
 
-    function updateBars() {
-      document.getElementById('player-health-bar').style.width = player.hp + "%";
-      document.getElementById('enemy-health-bar').style.width = enemy.hp + "%";
-      document.getElementById('player-hp').textContent = `HP: ${player.hp}`;
-      document.getElementById('enemy-hp').textContent = `HP: ${enemy.hp}`;
-      document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
-      document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
-    }
+  let currentEnemyIndex = 0;
+  let enemy = { ...enemyPokemons[currentEnemyIndex] };
 
-    function startGame() {
-      document.getElementById('main-menu').style.display = "none";
-      document.querySelector('.character-wrapper').style.display = "flex";
+  const logDiv = document.getElementById('log');
+  const attackEffect = document.getElementById('attack-effect');
+
+  function changePlayerPokemon(index) {
+    const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
+    player.pokemon.image = images[index];
+    document.getElementById('player-pokemon').src = player.pokemon.image;
+  }
+
+  function updateBars() {
+    document.getElementById('player-health-bar').style.width = player.hp + "%";
+    document.getElementById('enemy-health-bar').style.width = enemy.hp + "%";
+    document.getElementById('player-hp').textContent = `HP: ${player.hp}`;
+    document.getElementById('enemy-hp').textContent = `HP: ${enemy.hp}`;
+    document.getElementById('player-mana').textContent = `Mana: ${player.mana}`;
+    document.getElementById('enemy-mana').textContent = `Mana: ${enemy.mana}`;
+  }
+
+  function startGame() {
+    document.getElementById('main-menu').style.display = "none";
+    document.querySelector('.character-wrapper').style.display = "flex";
+    document.getElementById('enemy-pokemon').src = enemy.image;
+    updateBars();
+  }
+
+  function resetGame() {
+    player.hp = 100;
+    player.mana = 50;
+    currentEnemyIndex = 0;
+    enemy = { ...enemyPokemons[currentEnemyIndex] };
+    gameOver = false;
+    document.getElementById('enemy-pokemon').src = enemy.image;
+    updateBars();
+    logDiv.textContent = "";
+    enableAttacks(true);
+  }
+
+  function showEffect(text) {
+    attackEffect.textContent = text;
+    attackEffect.style.animation = "none";
+    void attackEffect.offsetWidth;
+    attackEffect.style.animation = "hit 0.5s ease-out forwards";
+  }
+
+  function enableAttacks(enabled) {
+    document.querySelectorAll('.attack-button').forEach(btn => {
+      btn.disabled = !enabled;
+    });
+  }
+
+  function nextEnemyPokemon() {
+    currentEnemyIndex++;
+    if (currentEnemyIndex < enemyPokemons.length) {
+      enemy = { ...enemyPokemons[currentEnemyIndex] };
+      document.getElementById('enemy-pokemon').src = enemy.image;
+      logDiv.textContent = "Rakip yeni bir Pokémon gönderdi!";
       updateBars();
+    } else {
+      gameOver = true;
+      logDiv.textContent = "Tebrikler, tüm rakipleri yendin!";
+      showEffect("Tüm Rakipler KO!");
+      enableAttacks(false);
+      setTimeout(() => alert("Tebrikler, oyunu kazandın!"), 500);
     }
+  }
 
-    function resetGame() {
-      player.hp = 100;
-      player.mana = 50;
-      enemy.hp = 100;
-      enemy.mana = 50;
-      gameOver = false;
-      updateBars();
-      logDiv.textContent = "";
-      enableAttacks(true);
-    }
+  function attack(index) {
+    if (attackInProgress || gameOver) return;
+    attackInProgress = true;
 
-    function showEffect(text) {
-      attackEffect.textContent = text;
-      attackEffect.style.animation = "none";
-      void attackEffect.offsetWidth;
-      attackEffect.style.animation = "hit 0.5s ease-out forwards";
-    }
-
-    function enableAttacks(enabled) {
-      document.querySelectorAll('.attack-button').forEach(btn => {
-        btn.disabled = !enabled;
-      });
-    }
-
-    function attack(index) {
-      if (attackInProgress || gameOver) return;
-      attackInProgress = true;
-
-      const atk = player.attacks[index];
-      if (player.mana < atk.manaCost) {
-        logDiv.textContent = "Yetersiz mana!";
-        attackInProgress = false;
-        return;
-      }
-
-      player.mana -= atk.manaCost;
-
-      if (atk.manaGain) {
-        player.mana += atk.manaGain;
-        if (player.mana > 100) player.mana = 100;
-      }
-
-      if (atk.name === "Alev Topu" && enemy.pokemon.image === "pokemon2.png") {
-        atk.damage = atk.damage / 2;
-        logDiv.textContent = "Alev Topu suya karşı zayıf!";
-      }
-
-      enemy.hp -= atk.damage;
-
-      if (enemy.hp <= 0) {
-        enemy.hp = 0;
-        gameOver = true;
-        logDiv.textContent = "Rakip yenildi!";
-        updateBars();
-        showEffect("KO!");
-        enableAttacks(false);
-        setTimeout(() => alert("Tebrikler, kazandın!"), 500);
-        return;
-      }
-
-      updateBars();
-      logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
-      showEffect(atk.name);
-
-      setTimeout(enemyAttack, 1000);
-    }
-
-    function enemyAttack() {
-      if (gameOver) return;
-
-      const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
-
-      if (atk.name === "Isırık" && player.pokemon.image === "pokemon2.png") {
-        atk.damage = atk.damage * 1.5;
-      }
-
-      if (enemy.mana >= atk.manaCost) {
-        enemy.mana -= atk.manaCost;
-        player.hp -= atk.damage;
-      }
-
-      if (player.hp <= 0) {
-        player.hp = 0;
-        gameOver = true;
-        logDiv.textContent = "Kaybettin!";
-        showEffect("X");
-        updateBars();
-        enableAttacks(false);
-        setTimeout(() => alert("Kaybettin! Tekrar dene."), 500);
-      } else {
-        logDiv.textContent += ` Rakip ${atk.name} kullandı. ${atk.damage} hasar aldı.`;
-        showEffect(atk.name);
-        updateBars();
-      }
-
+    const atk = player.attacks[index];
+    if (player.mana < atk.manaCost) {
+      logDiv.textContent = "Yetersiz mana!";
       attackInProgress = false;
+      return;
     }
-  </script>
+
+    player.mana -= atk.manaCost;
+
+    if (atk.manaGain) {
+      player.mana += atk.manaGain;
+      if (player.mana > 100) player.mana = 100;
+    }
+
+    enemy.hp -= atk.damage;
+
+    if (enemy.hp <= 0) {
+      enemy.hp = 0;
+      logDiv.textContent = "Rakip Pokémon bayıldı!";
+      showEffect("KO!");
+      updateBars();
+      setTimeout(nextEnemyPokemon, 1000);
+      attackInProgress = false;
+      return;
+    }
+
+    updateBars();
+    logDiv.textContent = `Sen ${atk.name} kullandın. ${atk.damage} hasar verdin.`;
+    showEffect(atk.name);
+
+    setTimeout(enemyAttack, 1000);
+  }
+
+  function enemyAttack() {
+    if (gameOver) return;
+
+    const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
+
+    if (enemy.mana >= atk.manaCost) {
+      enemy.mana -= atk.manaCost;
+      player.hp -= atk.damage;
+    }
+
+    if (player.hp <= 0) {
+      player.hp = 0;
+      gameOver = true;
+      logDiv.textContent = "Kaybettin!";
+      showEffect("X");
+      updateBars();
+      enableAttacks(false);
+      setTimeout(() => alert("Kaybettin! Tekrar dene."), 500);
+    } else {
+      logDiv.textContent += ` Rakip ${atk.name} kullandı. ${atk.damage} hasar aldı.`;
+      showEffect(atk.name);
+      updateBars();
+    }
+
+    attackInProgress = false;
+  }
+</script>
 </body>
 </html>
