@@ -115,6 +115,16 @@
       pointer-events: none;
       z-index: 10;
     }
+    @keyframes dash-forward {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(50px); }
+  100% { transform: translateX(0); }
+}
+
+.dash {
+  animation: dash-forward 0.3s ease-out;
+}
+
   </style>
 </head>
 <body>
@@ -337,6 +347,12 @@
           fireEffect.style.display = "none";
         }, 600);
       }
+      if (atk.name === "Yumruk") {
+  const playerPokemon = document.getElementById('player-pokemon');
+  playerPokemon.classList.add('dash');
+  setTimeout(() => playerPokemon.classList.remove('dash'), 300);
+}
+
 
       if (enemy.hp <= 0) {
         enemy.hp = 0;
