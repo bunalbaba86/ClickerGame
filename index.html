@@ -79,7 +79,7 @@
     }
     .attack-effect {
       position: absolute;
-      top: 120px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 2rem;
@@ -376,8 +376,8 @@
       // Hasar sayı efekti
       attackEffect.style.color = isCritical ? "red" : "yellow";
       attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
-      attackEffect.style.left = "65%";
-      attackEffect.style.top = "120px";
+      attackEffect.style.left = "35%";
+      attackEffect.style.top = "80px";
       attackEffect.style.display = "block";
       attackEffect.style.animation = "hit 0.5s ease-out forwards";
 
