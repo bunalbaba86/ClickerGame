@@ -296,6 +296,7 @@
 <audio id="punch-sound" src="punch.mp3"></audio>
 <audio id="basic-sound" src="basic.mp3"></audio>
 <audio id="defense-sound" src="defense.mp3"></audio>
+<audio id="bg-music" src="background.mp3" loop></audio>
 <script>
 
 let attackInProgress = false;
@@ -542,6 +543,14 @@ function enemyTurn() {
 
 function endGame(playerWon) {
   gameOver = true;
+
+  // Müzik durdur
+  const bgMusic = document.getElementById("bg-music");
+  if (bgMusic) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+
   if (playerWon) {
     showLog("Congratulations, you won!");
   } else {
@@ -570,8 +579,17 @@ function startGame() {
   document.querySelector(".character-wrapper").style.display = "flex";
   document.getElementById("main-menu").style.display = "none";
   resetGame();
-}
 
+  // Müzik başlat
+  const bgMusic = document.getElementById("bg-music");
+  if (bgMusic) {
+    bgMusic.volume = 0.3; // Ses seviyesi (0.0-1.0 arası)
+    bgMusic.play().catch(() => {
+      // Otomatik oynatma engellenirse kullanıcı etkileşimi beklenir
+      console.log("Background music playback prevented, waiting for user interaction");
+    });
+  }
+}
 function showStats(playerWon) {
   const statsScreen = document.getElementById("stats-screen");
   const statsContent = document.getElementById("stats-content");
