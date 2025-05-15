@@ -121,14 +121,14 @@
     pointer-events: none;
     z-index: 10;
   }
-  @keyframes dash-forward {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(50px); }
-    100% { transform: translateX(0); }
-  }
-  .dash {
-    animation: dash-forward 0.3s ease-out;
-  }
+  @keyframes recoil {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-30px); }
+  100% { transform: translateX(0); }
+}
+  .recoil {
+  animation: recoil 0.5s ease-out;
+}
   @keyframes damageFlash {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(2); }
@@ -395,7 +395,7 @@ function attack(attackIndex) {
   showLog(`You used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const enemyPokemonImg = document.getElementById("enemy-pokemon");
-  enemyPokemonImg.classList.add("dash");
+  enemyPokemonImg.classList.add("recoil");
 
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
@@ -415,7 +415,7 @@ function attack(attackIndex) {
   }
 
   setTimeout(() => {
-    enemyPokemonImg.classList.remove("dash");
+    enemyPokemonImg.classList.remove("recoil");
     attackEffect.style.display = "none";
     fireEffect.style.display = "none";
 
@@ -489,7 +489,7 @@ function enemyTurn() {
   showLog(`Enemy used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const playerPokemonImg = document.getElementById("player-pokemon");
-  playerPokemonImg.classList.add("dash");
+  playerPokemonImg.classList.add("recoil");
 
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = `-${damage}`;
@@ -502,7 +502,7 @@ function enemyTurn() {
   attackEffect.style.animation = "hit 0.5s ease-out forwards";
 
   setTimeout(() => {
-    playerPokemonImg.classList.remove("dash");
+    playerPokemonImg.classList.remove("recoil");
     attackEffect.style.display = "none";
     updateBars();
     if (player.hp <= 0) {
