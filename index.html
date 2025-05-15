@@ -1,255 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Kryptomon Battle</title>
-
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-image: url('my_image.jpg');
-      background-size: cover;
-      background-position: center;
-      color: #fff;
-    }
-    .character-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 80px;
-      margin-top: 50px;
-      display: none;
-    }
-    .character {
-      width: 200px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      padding: 10px;
-      margin: 10px;
-      position: relative;
-    }
-    .pokemon-image {
-      width: 250px;
-      height: 250px;
-      object-fit: contain;
-      position: relative;
-    }
-    .pokemon-container {
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
-      flex: 1;
-      position: relative;
-    }
-    .bar-container {
-      width: 200px;
-      height: 20px;
-      background-color: #ddd;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px auto;
-      overflow: hidden;
-    }
-    .health-bar, .mana-bar {
-      height: 100%;
-      width: 100%;
-      border-radius: 5px;
-      transition: width 0.3s ease;
-    }
-    .health-bar {
-      background-color: limegreen;
-    }
-    .mana-bar {
-      background-color: deepskyblue;
-    }
-    .pokemon-switch {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .pokemon-switch button {
-      background-color: transparent;
-      border: 2px solid #ff7e5f;
-      padding: 10px;
-      cursor: pointer;
-    }
-    .pokemon-switch button img {
-      width: 50px;
-      height: 50px;
-    }
-    .attack-effect {
-      position: absolute;
-      top: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      animation: hit 1s ease-out forwards;
-      pointer-events: none;
-      color: yellow;
-      font-weight: bold;
-      z-index: 20;
-    }
-    @keyframes hit {
-      0% { opacity: 1; transform: translate(-50%, -20px); }
-      100% { opacity: 0; transform: translate(-50%, -60px); }
-    }
-    .log {
-      margin-top: 20px;
-      min-height: 50px;
-      background-color: rgba(0,0,0,0.5);
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-    #fire-effect {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 150px;
-      display: none;
-      pointer-events: none;
-      z-index: 10;
-    }
-    @keyframes dash-forward {
-      0% { transform: translateX(0); }
-      50% { transform: translateX(50px); }
-      100% { transform: translateX(0); }
-    }
-    .dash {
-      animation: dash-forward 0.3s ease-out;
-    }
-    @keyframes damageFlash {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(2); }
-    }
-    /* İstatistik ekranı */
-    #stats-screen {
-      display: none;
-      background-color: rgba(0,0,0,0.8);
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 350px;
-      padding: 20px;
-      border-radius: 15px;
-      color: #fff;
-      font-size: 1.1rem;
-      text-align: left;
-      box-shadow: 0 0 20px 5px #ff7e5f;
-      z-index: 100;
-    }
-    #stats-screen h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #ff7e5f;
-    }
-    #stats-screen button {
-      display: block;
-      margin: 15px auto 0;
-      padding: 8px 20px;
-      background-color: #ff7e5f;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* Defans ikonu */
-    .defense-icon {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 30px;
-      height: 30px;
-      background-color: rgba(0, 150, 255, 0.8);
-      border-radius: 50%;
-      box-shadow: 0 0 10px 3px rgba(0, 150, 255, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 50;
-      pointer-events: none;
-    }
-    .defense-icon::after {
-      content: "🛡️";
-      font-size: 20px;
-      color: white;
-    }
-    .attack-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  margin-right: 8px;
-  vertical-align: middle;
-  object-fit: cover;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-.attack-buttons button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-}
-
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kryptomon Battle Game</title>
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-image: url('my_image.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+  }
+  .character-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 80px;
+    margin-top: 50px;
+    display: none;
+  }
+  .character {
+    width: 200px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    padding: 10px;
+    margin: 10px;
+    position: relative;
+  }
+  .pokemon-image {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    position: relative;
+  }
+  .pokemon-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+  .bar-container {
+    width: 200px;
+    height: 20px;
+    background-color: #ddd;
+    border: 1px solid #999;
+    border-radius: 5px;
+    margin: 5px auto;
+    overflow: hidden;
+  }
+  .health-bar, .mana-bar {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
+  .health-bar {
+    background-color: limegreen;
+  }
+  .mana-bar {
+    background-color: deepskyblue;
+  }
+  .pokemon-switch {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .pokemon-switch button {
+    background-color: transparent;
+    border: 2px solid #ff7e5f;
+    padding: 10px;
+    cursor: pointer;
+  }
+  .pokemon-switch button img {
+    width: 50px;
+    height: 50px;
+  }
+  .attack-effect {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    animation: hit 1s ease-out forwards;
+    pointer-events: none;
+    color: yellow;
+    font-weight: bold;
+    z-index: 20;
+  }
+  @keyframes hit {
+    0% { opacity: 1; transform: translate(-50%, -20px); }
+    100% { opacity: 0; transform: translate(-50%, -60px); }
+  }
+  .log {
+    margin-top: 20px;
+    min-height: 50px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  #fire-effect {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    display: none;
+    pointer-events: none;
+    z-index: 10;
+  }
+  @keyframes dash-forward {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(50px); }
+    100% { transform: translateX(0); }
+  }
+  .dash {
+    animation: dash-forward 0.3s ease-out;
+  }
+  @keyframes damageFlash {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(2); }
+  }
+  #stats-screen {
+    display: none;
+    background-color: rgba(0,0,0,0.8);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    padding: 20px;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 1.1rem;
+    text-align: left;
+    box-shadow: 0 0 20px 5px #ff7e5f;
+    z-index: 100;
+  }
+  #stats-screen h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #ff7e5f;
+  }
+  #stats-screen button {
+    display: block;
+    margin: 15px auto 0;
+    padding: 8px 20px;
+    background-color: #ff7e5f;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .defense-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 150, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px 3px rgba(0, 150, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    pointer-events: none;
+  }
+  .defense-icon::after {
+    content: "🛡️";
+    font-size: 20px;
+    color: white;
+  }
+  .attack-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    object-fit: cover;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  }
+  .attack-buttons button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+</style>
 </head>
 <body>
-  <h1>🔥 KRYPTOMON BATTLE🔥</h1>
+
+<h1>🔥 Kryptomon Battle Game 🔥</h1>
 
 <div id="main-menu">
   <button onclick="startGame()">START</button>
 </div>
 
-
-  <div class="character-wrapper">
-    <div class="character" id="player-info">
-      <h2>Trainer Bob</h2>
-      <img src="sen.png" alt="Sen" id="player-image" />
-      <div class="bar-container"><div id="player-health-bar" class="health-bar"></div></div>
-      <div class="bar-container"><div id="player-mana-bar" class="mana-bar"></div></div>
-      <div class="hp" id="player-hp">HP: 100</div>
-      <div class="hp" id="player-mana">Mana: 0</div>
-      <div id="player-defense-icon" class="defense-icon" style="display:none;"></div>
-    </div>
-
-    <div class="pokemon-container">
-      <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Senin Pokemonun" />
-      <div class="attack-effect" id="attack-effect"></div>
-      <img class="pokemon-image" id="enemy-pokemon" src="enemy-pokemon2.png" alt="Rakip Pokemon" />
-      <img id="fire-effect" src="fire.gif" alt="Fire Effect" />
-    </div>
-
-    <div class="character" id="enemy-info">
-      <h2>Grass Trainer</h2>
-      <img src="rakip.png" alt="Rakip" id="enemy-image" />
-      <div class="bar-container"><div id="enemy-health-bar" class="health-bar"></div></div>
-      <div class="bar-container"><div id="enemy-mana-bar" class="mana-bar"></div></div>
-      <div class="hp" id="enemy-hp">HP: 100</div>
-      <div class="hp" id="enemy-mana">Mana: 0</div>
-    </div>
+<div class="character-wrapper">
+  <div class="character" id="player-info">
+    <h2>Trainer Bob</h2>
+    <img src="sen.png" alt="Player" id="player-image" />
+    <div class="bar-container"><div id="player-health-bar" class="health-bar"></div></div>
+    <div class="bar-container"><div id="player-mana-bar" class="mana-bar"></div></div>
+    <div class="hp" id="player-hp">HP: 100</div>
+    <div class="hp" id="player-mana">Mana: 0</div>
+    <div id="player-defense-icon" class="defense-icon" style="display:none;"></div>
   </div>
 
-  <div class="pokemon-switch">
-    <button onclick="changePlayerPokemon(0)"><img src="player-pokemon.png" alt="Pokemon 1" /></button>
-    <button onclick="changePlayerPokemon(1)"><img src="pokemon2.png" alt="Pokemon 2" /></button>
-    <button onclick="changePlayerPokemon(2)"><img src="pokemon3.png" alt="Pokemon 3" /></button>
+  <div class="pokemon-container">
+    <img class="pokemon-image" id="player-pokemon" src="player-pokemon.png" alt="Your Pokemon" />
+    <div class="attack-effect" id="attack-effect"></div>
+    <img class="pokemon-image" id="enemy-pokemon" src="enemy-pokemon2.png" alt="Enemy Pokemon" />
+    <img id="fire-effect" src="fire.gif" alt="Fire Effect" />
   </div>
 
-  <div>
-    <div>
+  <div class="character" id="enemy-info">
+    <h2>Ghost Trainer</h2>
+    <img src="rakip.png" alt="Enemy" id="enemy-image" />
+    <div class="bar-container"><div id="enemy-health-bar" class="health-bar"></div></div>
+    <div class="bar-container"><div id="enemy-mana-bar" class="mana-bar"></div></div>
+    <div class="hp" id="enemy-hp">HP: 100</div>
+    <div class="hp" id="enemy-mana">Mana: 0</div>
+  </div>
+</div>
+
+<div class="pokemon-switch">
+  <button onclick="changePlayerPokemon(0)"><img src="player-pokemon.png" alt="Pokemon 1" /></button>
+  <button onclick="changePlayerPokemon(1)"><img src="pokemon2.png" alt="Pokemon 2" /></button>
+  <button onclick="changePlayerPokemon(2)"><img src="pokemon3.png" alt="Pokemon 3" /></button>
+</div>
+
+<div>
   <h3>Choose Your Attack:</h3>
   <button onclick="attack(0)">
     <img src="fireball.jpg" class="attack-icon" />
@@ -261,7 +256,7 @@
   </button>
   <button onclick="attack(2)">
     <img src="basic.png" class="attack-icon" />
-    Basic Attack
+    Howl
   </button>
   <button onclick="useDefense()">
     <img src="shield.jpg" class="attack-icon" />
@@ -271,62 +266,58 @@
   <button onclick="resetGame()">🔄 Restart</button>
 </div>
 
-  <div id="log" class="log"></div>
+<div id="log" class="log"></div>
 
-  <!-- Statistics Screen -->
+<!-- Statistics Screen -->
 <div id="stats-screen">
   <h2>Game Statistics</h2>
   <div id="stats-content"></div>
   <button onclick="closeStats()">Close and Restart</button>
 </div>
 
+<audio id="fire-sound" src="fire.mp3"></audio>
+<audio id="punch-sound" src="punch.mp3"></audio>
+<audio id="basic-sound" src="basic.mp3"></audio>
 
-  <audio id="fire-sound" src="fire.mp3"></audio>
-  <audio id="punch-sound" src="punch.mp3"></audio>
-  <audio id="basic-sound" src="basic.mp3"></audio>
+<script>
+let attackInProgress = false;
+let gameOver = false;
 
-  <script>
-    let attackInProgress = false;
-    let gameOver = false;
+let playerDamageDealt = 0;
+let enemyDamageDealt = 0;
+let attacksUsed = { 'Fireball': 0, 'Punch': 0, 'Howl': 0, 'Defense Spell': 0 };
+let enemyAttacksUsed = {};
 
-    // İstatistik için sayıcılar
-    let playerDamageDealt = 0;
-    let enemyDamageDealt = 0;
-    let attacksUsed = { 'Fireball': 0, 'Punch': 0, 'Howl': 0, 'Defense Spell': 0 };
-    let enemyAttacksUsed = { 'Fireball': 0, 'Punch': 0, 'Howl': 0, 'Defense Spell': 0 };
+const player = {
+  hp: 100,
+  mana: 0,
+  defenseActive: false,
+  defenseTurnsLeft: 0,
+  pokemon: { image: "player-pokemon.png" },
+  attacks: [
+    { name: "Fireball", damage: 20, manaCost: 30 },
+    { name: "Punch", damage: 10, manaCost: 5 },
+    { name: "Howl", damage: 0, manaCost: 0, manaGain: 50 }
+  ]
+};
 
-    const player = {
-      hp: 100,
-      mana: 50,
-      defenseActive: false,
-      defenseTurnsLeft: 0,
-      pokemon: { image: "player-pokemon.png" },
-      attacks: [
-        attacks: [
-  { name: "Fireball", damage: 20, manaCost: 30 },
-  { name: "Punch", damage: 10, manaCost: 5 },
-  { name: "Howl", damage: 0, manaCost: 0, manaGain: 50 }
-]
-
-    };
-
-    const enemyPokemons = [
-      {
-        hp: 100, mana: 50, image: "enemy-pokemon.png",
-        attacks: [
-  { name: "Bite", damage: 15, manaCost: 10 },
-  { name: "Claw", damage: 10, manaCost: 5 },
-  { name: "Growl", damage: 0, manaCost: 0, manaGain: 50 }
-]
-},
-{
-hp: 120, mana: 50, image: "enemy-pokemon2.png",
-attacks: [
-  { name: "Thunderbolt", damage: 25, manaCost: 20 },
-  { name: "Heel Kick", damage: 10, manaCost: 5 },
-  { name: "Roar", damage: 0, manaCost: 0, manaGain: 50 }
-]
-}
+const enemyPokemons = [
+  {
+    hp: 100, mana: 50, image: "enemy-pokemon.png",
+    attacks: [
+      { name: "Bite", damage: 15, manaCost: 10 },
+      { name: "Claw", damage: 10, manaCost: 5 },
+      { name: "Growl", damage: 0, manaCost: 0, manaGain: 50 }
+    ]
+  },
+  {
+    hp: 120, mana: 50, image: "enemy-pokemon2.png",
+    attacks: [
+      { name: "Thunderbolt", damage: 25, manaCost: 20 },
+      { name: "Heel Kick", damage: 10, manaCost: 5 },
+      { name: "Roar", damage: 0, manaCost: 0, manaGain: 50 }
+    ]
+  }
 ];
 let enemy = { ...enemyPokemons[1] };
 
@@ -349,16 +340,15 @@ function updateBars() {
   document.getElementById("enemy-hp").textContent = "HP: " + Math.max(0, enemy.hp);
   document.getElementById("enemy-mana").textContent = "Mana: " + Math.max(0, enemy.mana);
 
-  // Defans ikonu göster/gizle
   document.getElementById("player-defense-icon").style.display = player.defenseActive ? "flex" : "none";
 }
 
 function playSound(name) {
   const sounds = {
-    "Alev Topu": "fire-sound",
-    "Yumruk": "punch-sound",
-    "Temel Saldırı": "basic-sound",
-    "Defans Büyüsü": "basic-sound"
+    "Fireball": "fire-sound",
+    "Punch": "punch-sound",
+    "Basic Attack": "basic-sound",
+    "Defense Spell": "basic-sound"
   };
   const soundId = sounds[name];
   if (!soundId) return;
@@ -389,16 +379,11 @@ function attack(attackIndex) {
 
   attackInProgress = true;
 
-  // Mana güncelle
   player.mana -= attackData.manaCost || 0;
   if (attackData.manaGain) player.mana = Math.min(player.mana + attackData.manaGain, 50);
 
-  // Kritik vuruş: %25 şansla hasar 2 kat
   const isCritical = Math.random() < 0.25;
   const damage = (attackData.damage || 0) * (isCritical ? 2 : 1);
-
-  // Defans aktifse hasar %90 azaltılır (yalnızca düşmandan alınan hasar için geçerli)
-  // Burada oyuncu saldırdığı için defans düşmanı etkilemez
 
   if (damage > 0) {
     enemy.hp -= damage;
@@ -407,7 +392,7 @@ function attack(attackIndex) {
 
   attacksUsed[attackData.name]++;
 
-  showLog(`You used ${attackData.name} !${isCritical ? "CRITICAL HIT!" : ""}`, isCritical);
+  showLog(`You used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const enemyPokemonImg = document.getElementById("enemy-pokemon");
   enemyPokemonImg.classList.add("dash");
@@ -419,10 +404,10 @@ function attack(attackIndex) {
   attackEffect.style.display = "block";
 
   attackEffect.style.animation = "none";
-  attackEffect.offsetHeight; // trigger reflow
+  attackEffect.offsetHeight;
   attackEffect.style.animation = "hit 1s ease-out forwards";
 
-  if (attackData.name === "Alev Topu") {
+  if (attackData.name === "Fireball") {
     fireEffect.style.display = "block";
     playSound(attackData.name);
   } else {
@@ -443,7 +428,6 @@ function attack(attackIndex) {
   }, 700);
 }
 
-// Defans büyüsü kullanımı
 function useDefense() {
   if (attackInProgress || gameOver) return;
   const defenseManaCost = 20;
@@ -458,11 +442,10 @@ function useDefense() {
   player.defenseActive = true;
   player.defenseTurnsLeft = 1;
 
-  showLog("Defense Spell is active! Incoming damage will be reduced by 90%.");
+  showLog("Defense Spell active! Incoming damage reduced by 90%.");
 
-  // Defans büyüsü için görsel efekt (ikonu zaten gösteriliyor)
   updateBars();
-  playSound("Defans Büyüsü");
+  playSound("Defense Spell");
 
   setTimeout(() => {
     attackInProgress = false;
@@ -485,17 +468,15 @@ function enemyTurn() {
 
   enemy.mana -= attackData.manaCost;
 
-  // Kritik vuruş %20
   const isCritical = Math.random() < 0.2;
   let damage = attackData.damage * (isCritical ? 2 : 1);
 
-  // Eğer oyuncu defans aktifse hasar %90 azaltılır ve defans sona erer
   if (player.defenseActive) {
-    damage = Math.ceil(damage * 0.1); // %90 azalt
+    damage = Math.ceil(damage * 0.1);
     player.defenseTurnsLeft--;
     if (player.defenseTurnsLeft <= 0) {
       player.defenseActive = false;
-      showLog("The Defense Spell effect has ended.");
+      showLog("Defense Spell has worn off.");
     }
     updateBars();
   }
@@ -505,7 +486,7 @@ function enemyTurn() {
 
   enemyAttacksUsed[attackData.name] = (enemyAttacksUsed[attackData.name] || 0) + 1;
 
-  showLog(`Enemy used ${attackData.name} !${isCritical ? "CRITICAL HIT!" : ""}`, isCritical);
+  showLog(`Enemy used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const playerPokemonImg = document.getElementById("player-pokemon");
   playerPokemonImg.classList.add("dash");
@@ -534,11 +515,10 @@ function enemyTurn() {
 
 function endGame(playerWon) {
   gameOver = true;
-  const log = document.getElementById("log");
   if (playerWon) {
-    showLog("Congratulations, You Won!");
+    showLog("Congratulations, you won!");
   } else {
-    showLog("You Lose, TryAgain!");
+    showLog("You lost! Try again.");
   }
   showStats(playerWon);
 }
@@ -550,8 +530,8 @@ function resetGame() {
   player.defenseTurnsLeft = 0;
   playerDamageDealt = 0;
   enemyDamageDealt = 0;
-  attacksUsed = { 'Fireball': 0, 'Punch': 0, 'Howl': 0, 'Defense Spell': 0 };
-  enemyAttacksUsed = { 'Fireball': 0, 'Punch': 0, 'Howl': 0, 'Defense Spell': 0 };
+  attacksUsed = { 'Fireball': 0, 'Punch': 0, 'Basic Attack': 0, 'Defense Spell': 0 };
+  enemyAttacksUsed = {};
   enemy = { ...enemyPokemons[1] };
   attackInProgress = false;
   gameOver = false;
@@ -565,23 +545,22 @@ function startGame() {
   resetGame();
 }
 
-// İstatistikleri göster
 function showStats(playerWon) {
   const statsScreen = document.getElementById("stats-screen");
   const statsContent = document.getElementById("stats-content");
   statsContent.innerHTML = `
-  <p>Player ${playerWon ? "won" : "lost"}.</p>
-  <p>Total Damage Dealt: ${playerDamageDealt}</p>
-  <p>Enemy Total Damage: ${enemyDamageDealt}</p>
-  <p>Attacks Used:</p>
-  <ul>
-    ${Object.entries(attacksUsed).map(([key,val]) => `<li>${key}: ${val} times</li>`).join('')}
-  </ul>
-  <p>Enemy Attacks:</p>
-  <ul>
-    ${Object.entries(enemyAttacksUsed).map(([key,val]) => `<li>${key}: ${val} times</li>`).join('')}
-  </ul>
-`;
+    <p>Player ${playerWon ? "won" : "lost"}.</p>
+    <p>Total Damage Dealt: ${playerDamageDealt}</p>
+    <p>Enemy Total Damage: ${enemyDamageDealt}</p>
+    <p>Attacks Used:</p>
+    <ul>
+      ${Object.entries(attacksUsed).map(([key,val]) => `<li>${key}: ${val} times</li>`).join('')}
+    </ul>
+    <p>Enemy Attacks:</p>
+    <ul>
+      ${Object.entries(enemyAttacksUsed).map(([key,val]) => `<li>${key}: ${val} times</li>`).join('')}
+    </ul>
+  `;
   statsScreen.style.display = "block";
 }
 
@@ -591,10 +570,11 @@ function closeStats() {
 }
 
 function changePlayerPokemon(index) {
-  // Burada farklı pokemonları değiştirme fonksiyonu
-  // Örnek: sadece resim değiştiriyoruz
   const images = ["player-pokemon.png", "pokemon2.png", "pokemon3.png"];
   player.pokemon.image = images[index];
   document.getElementById("player-pokemon").src = images[index];
 }
-</script> </body> </html> 
+</script>
+
+</body>
+</html>
