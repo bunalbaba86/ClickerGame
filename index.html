@@ -126,9 +126,10 @@
   50% { transform: translateX(-30px); }
   100% { transform: translateX(0); }
 }
-  .recoil {
-  animation: recoil 0.5s ease-out;
+.recoil {
+  animation: recoil 0.3s ease-out;
 }
+
   @keyframes damageFlash {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(2); }
@@ -395,7 +396,7 @@ function attack(attackIndex) {
   showLog(`You used ${attackData.name}!${isCritical ? " CRITICAL HIT!" : ""}`, isCritical);
 
   const enemyPokemonImg = document.getElementById("enemy-pokemon");
-  enemyPokemonImg.classList.add("dash");
+  enemyPokemonImg.classList.add("recoil");
 
   attackEffect.style.color = isCritical ? "red" : "yellow";
   attackEffect.textContent = damage > 0 ? `-${damage}` : "+Mana";
