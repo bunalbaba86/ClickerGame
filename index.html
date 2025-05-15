@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kryptomon Battle Game</title>
 <style>
+  #screen-flash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1000;
+  transition: opacity 0.2s ease-out;
+}
+
   body {
     font-family: sans-serif;
     text-align: center;
@@ -92,6 +104,7 @@
     font-weight: bold;
     z-index: 20;
   }
+
   @keyframes hit {
     0% { opacity: 1; transform: translate(-50%, -20px); }
     100% { opacity: 0; transform: translate(-50%, -60px); }
@@ -205,8 +218,9 @@
   }
 </style>
 </head>
-<body>
 
+<body>
+  
 <h1>🔥 Kryptomon Battle Game 🔥</h1>
 
 <div id="main-menu">
@@ -283,6 +297,7 @@
 <audio id="basic-sound" src="basic.mp3"></audio>
 <audio id="defense-sound" src="defense.mp3"></audio>
 <script>
+
 let attackInProgress = false;
 let gameOver = false;
 
@@ -386,6 +401,7 @@ function attack(attackIndex) {
   if (attackData.manaGain) player.mana = Math.min(player.mana + attackData.manaGain, 50);
 
   const isCritical = Math.random() < 0.25;
+  if (isCritical) showCriticalFlash();
   const damage = (attackData.damage || 0) * (isCritical ? 2 : 1);
 
   if (damage > 0) {
@@ -457,6 +473,7 @@ function useDefense() {
 }
 
 function enemyTurn() {
+  if (isCritical) showCriticalFlash();
   if (gameOver) return;
   const possibleAttacks = enemy.attacks.filter(a => a.manaCost <= enemy.mana);
   if (possibleAttacks.length === 0) {
@@ -577,7 +594,15 @@ function changePlayerPokemon(index) {
   player.pokemon.image = images[index];
   document.getElementById("player-pokemon").src = images[index];
 }
-</script>
+  function showCriticalFlash() {
+  const flash = document.getElementById("screen-flash");
+  flash.style.opacity = "1";
+  setTimeout(() => {
+    flash.style.opacity = "0";
+  }, 100);
+}
 
+</script>
+<div id="screen-flash"></div>
 </body>
 </html>
