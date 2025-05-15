@@ -124,9 +124,9 @@
 
   <div>
     <h3>Saldırı Seç:</h3>
-    <button onclick="attack(0)">Alev Topu (20 dmg)</button>
-    <button onclick="attack(1)">Yumruk (10 dmg)</button>
-    <button onclick="attack(2)">Temel Saldırı (+10 Mana)</button>
+    <button onclick="attack(0)" class="attack-button">Alev Topu (20 dmg)</button>
+    <button onclick="attack(1)" class="attack-button">Yumruk (10 dmg)</button>
+    <button onclick="attack(2)" class="attack-button">Temel Saldırı (+10 Mana)</button>
     <button onclick="resetGame()">🔄 Yeniden Başlat</button>
   </div>
 
@@ -134,6 +134,7 @@
 
   <script>
     let attackInProgress = false;
+    let gameOver = false;
 
     const player = {
       hp: 100,
@@ -185,23 +186,30 @@
       player.mana = 50;
       enemy.hp = 100;
       enemy.mana = 50;
+      gameOver = false;
       updateBars();
       logDiv.textContent = "";
+      enableAttacks(true);
     }
 
     function showEffect(text) {
       attackEffect.textContent = text;
       attackEffect.style.animation = "none";
-      void attackEffect.offsetWidth; 
+      void attackEffect.offsetWidth;
       attackEffect.style.animation = "hit 0.5s ease-out forwards";
     }
 
+    function enableAttacks(enabled) {
+      document.querySelectorAll('.attack-button').forEach(btn => {
+        btn.disabled = !enabled;
+      });
+    }
+
     function attack(index) {
-      if (attackInProgress) return;
+      if (attackInProgress || gameOver) return;
       attackInProgress = true;
 
       const atk = player.attacks[index];
-
       if (player.mana < atk.manaCost) {
         logDiv.textContent = "Yetersiz mana!";
         attackInProgress = false;
@@ -210,20 +218,26 @@
 
       player.mana -= atk.manaCost;
 
-      // Elementsel etkileşim ekle
+      if (atk.manaGain) {
+        player.mana += atk.manaGain;
+        if (player.mana > 100) player.mana = 100;
+      }
+
       if (atk.name === "Alev Topu" && enemy.pokemon.image === "pokemon2.png") {
-        atk.damage = atk.damage / 2;  // Suya karşı ateş zayıf
+        atk.damage = atk.damage / 2;
         logDiv.textContent = "Alev Topu suya karşı zayıf!";
       }
 
       enemy.hp -= atk.damage;
-      if (atk.manaGain) player.mana += atk.manaGain;
 
       if (enemy.hp <= 0) {
         enemy.hp = 0;
+        gameOver = true;
         logDiv.textContent = "Rakip yenildi!";
         updateBars();
         showEffect("KO!");
+        enableAttacks(false);
+        setTimeout(() => alert("Tebrikler, kazandın!"), 500);
         return;
       }
 
@@ -235,11 +249,12 @@
     }
 
     function enemyAttack() {
+      if (gameOver) return;
+
       const atk = enemy.attacks.find(a => enemy.mana >= a.manaCost) || enemy.attacks[1];
-      
-      // Elementsel etkileşim ekle
+
       if (atk.name === "Isırık" && player.pokemon.image === "pokemon2.png") {
-        atk.damage = atk.damage * 1.5;  // Suya karşı zehirin etkisi arttı
+        atk.damage = atk.damage * 1.5;
       }
 
       if (enemy.mana >= atk.manaCost) {
@@ -249,14 +264,18 @@
 
       if (player.hp <= 0) {
         player.hp = 0;
+        gameOver = true;
         logDiv.textContent = "Kaybettin!";
         showEffect("X");
+        updateBars();
+        enableAttacks(false);
+        setTimeout(() => alert("Kaybettin! Tekrar dene."), 500);
       } else {
         logDiv.textContent += ` Rakip ${atk.name} kullandı. ${atk.damage} hasar aldı.`;
         showEffect(atk.name);
+        updateBars();
       }
 
-      updateBars();
       attackInProgress = false;
     }
   </script>
