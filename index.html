@@ -365,39 +365,36 @@
 
   // Withdraw tokens function (real token transfer on Polygon)
   async function withdrawTokens() {
-    if (!userAddress) {
-      alert("Please connect your wallet.");
-      return;
-    }
-
-    if (playerBalance <= 0) {
-      alert("You have no rewards to withdraw.");
-      return;
-    }
-
-    const tokenAddress = "0x8eF3DAe41A03eD2006D4078C92D21Ea8D61e0a90";
-    const tokenAbi = [
-      "function transfer(address to, uint256 amount) public returns (bool)"
-    ];
-
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-
-      const contract = new ethers.Contract(tokenAddress, tokenAbi, signer);
-      const amount = ethers.utils.parseUnits(playerBalance.toString(), 18);
-
-      const tx = await contract.transfer(userAddress, amount);
-      await tx.wait();
-
-      alert(`✅ ${playerBalance.toFixed(4)} Z1N3D tokens sent to ${userAddress}!`);
-      playerBalance = 0;
-      logMessage("💸 Tokens withdrawn successfully.");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Token transfer failed. Make sure you are using the wallet that holds the tokens.");
-    }
+  if (!userAddress) {
+    alert("Please connect your wallet.");
+    return;
   }
+  if (playerBalance <= 0) {
+    alert("You have no rewards to withdraw.");
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/withdraw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: userAddress, amount: playerBalance })
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+      alert(`✅ Tokens sent! TxHash: ${data.txHash}`);
+      playerBalance = 0;
+    } else {
+      alert('❌ Withdraw failed!');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('❌ Withdraw request error!');
+  }
+}
+
 </script>
 </body>
 </html>
