@@ -375,11 +375,14 @@
   }
 
   try {
-    const response = await fetch('http://localhost:3000/withdraw', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: userAddress, amount: playerBalance })
-    });
+    const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
+
+const response = await fetch(`${BACKEND_URL}/withdraw`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ to: userAddress, amount: playerBalance })
+});
+
 
     const data = await response.json();
 
