@@ -36,6 +36,18 @@
       font-weight: bold;
       cursor: pointer;
     }
+    #status-bar {
+      position: fixed;
+      top: 60px; right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      z-index: 1000;
+      max-width: 280px;
+      text-align: left;
+    }
     #game-log {
       margin: 80px auto 20px;
       padding: 15px;
@@ -106,19 +118,6 @@
     button.attack-btn:hover {
       background-color: #ffb997;
     }
-    #status-bar {
-      max-width: 500px;
-      margin: 60px auto 10px;
-      background: rgba(0,0,0,0.7);
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-size: 1.1rem;
-      display: flex;
-      justify-content: space-around;
-      color: #fbb03b;
-      font-weight: bold;
-      user-select: none;
-    }
   </style>
 </head>
 <body>
@@ -128,10 +127,9 @@
   <span id="wallet-address">Not connected</span>
   <button onclick="connectWallet()">Connect Wallet</button>
   <button onclick="withdrawTokens()">Withdraw</button>
-  <button onclick="claimTokens(1000)">Claim 1000 Score</button> <!-- Örnek -->
 </div>
 
-<!-- STATUS BAR: Token Balance, Game Earnings, Score -->
+<!-- STATUS BAR -->
 <div id="status-bar">
   <div id="token-balance">Token Balance: 0 Z1N3D</div>
   <div id="game-balance">Game Earnings: 0 Z1N3D</div>
@@ -173,14 +171,17 @@
 </div>
 
 <script>
-  let userAddress = null;
+  const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
+
+  let userAddress = localStorage.getItem('userAddress') || null;
   let playerBalance = 0;
-  let gameBalance = 0;
-  let score = 0;
+  let gameBalance = parseFloat(localStorage.getItem('gameBalance')) || 0;
+  let score = parseInt(localStorage.getItem('score')) || 0;
+  let dailyEarned = parseFloat(localStorage.getItem('dailyEarned')) || 0;
   let gameOver = false;
   let attackInProgress = false;
 
-  const BACKEND_URL = 'https://kryptomon-backend.onrender.com'; // Backend adresini kendi ortamına göre değiştir
+  const DAILY_LIMIT = 0.1; // max 0.1 token daily
 
   const player = {
     hp: 100,
@@ -204,12 +205,21 @@
     ]
   };
 
+  window.onload = () => {
+    if(userAddress) {
+      document.getElementById("wallet-address").textContent = userAddress;
+      updateTokenBalance();
+    }
+    updateGameStatus();
+  }
+
   async function connectWallet() {
     if (window.ethereum) {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
         userAddress = accounts[0];
+        localStorage.setItem('userAddress', userAddress);
         document.getElementById("wallet-address").textContent = userAddress;
         await updateTokenBalance();
         logMessage("Wallet connected: " + userAddress);
@@ -244,17 +254,6 @@
     line.textContent = msg;
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
-  }
-
-  function updateBars() {
-    document.getElementById("player-health-bar").style.width = Math.max(0, player.hp) + "%";
-    document.getElementById("player-mana-bar").style.width = Math.min(100, player.mana * 2) + "%";
-    document.getElementById("player-hp").textContent = "HP: " + Math.max(0, player.hp);
-    document.getElementById("player-mana").textContent = "Mana: " + Math.max(0, player.mana);
-    document.getElementById("enemy-health-bar").style.width = Math.max(0, enemy.hp) + "%";
-    document.getElementById("enemy-mana-bar").style.width = Math.min(100, enemy.mana * 2) + "%";
-    document.getElementById("enemy-hp").textContent = "HP: " + Math.max(0, enemy.hp);
-    document.getElementById("enemy-mana").textContent = "Mana: " + Math.max(0, enemy.mana);
   }
 
   function attack(index) {
@@ -332,12 +331,23 @@
   }
 
   function onGameEnd(playerWon) {
-    if (playerWon) {
+    if(playerWon) {
       score += 100;
-      gameBalance += 0.01;
+      if(dailyEarned < DAILY_LIMIT) {
+        let canEarn = DAILY_LIMIT - dailyEarned;
+        let earn = Math.min(0.01, canEarn);
+        gameBalance += earn;
+        dailyEarned += earn;
+        localStorage.setItem('dailyEarned', dailyEarned);
+        logMessage(`💰 You earned ${earn.toFixed(4)} Z1N3D! Today's max: ${DAILY_LIMIT}`);
+      } else {
+        logMessage("⚠️ Daily earning limit reached.");
+      }
     } else {
       score -= 100;
     }
+    localStorage.setItem('score', score);
+    localStorage.setItem('gameBalance', gameBalance);
     updateGameStatus();
     updateTokenBalance();
   }
@@ -349,7 +359,6 @@
     onGameEnd(won);
     if (won) {
       logMessage("🎉 You won!");
-      logMessage(`💰 You earned 0.01 Z1N3D token! Your game balance: ${gameBalance.toFixed(4)}`);
     } else {
       logMessage("💀 You lost!");
     }
@@ -383,6 +392,7 @@
       if (data.status === 'success') {
         alert(`✅ Tokens sent! Tx: ${data.txHash}`);
         gameBalance = 0;
+        localStorage.setItem('gameBalance', gameBalance);
         updateGameStatus();
       } else {
         alert('❌ Withdraw failed!');
@@ -393,29 +403,16 @@
     }
   }
 
-  async function claimTokens(scoreToClaim) {
-    if (!userAddress) {
-      alert("Connect wallet first.");
-      return;
-    }
-    try {
-      const response = await fetch(`${BACKEND_URL}/claim`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: userAddress, score: scoreToClaim })
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        alert(`🎉 You earned ${data.amount} Z1N3D!\nTx: ${data.txHash}`);
-      } else {
-        alert(`❌ Claim failed: ${data.error}`);
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Network error during claim.");
-    }
+  function updateBars() {
+    document.getElementById("player-health-bar").style.width = Math.max(0, player.hp) + "%";
+    document.getElementById("player-mana-bar").style.width = Math.min(100, player.mana * 2) + "%";
+    document.getElementById("player-hp").textContent = "HP: " + Math.max(0, player.hp);
+    document.getElementById("player-mana").textContent = "Mana: " + Math.max(0, player.mana);
+    document.getElementById("enemy-health-bar").style.width = Math.max(0, enemy.hp) + "%";
+    document.getElementById("enemy-mana-bar").style.width = Math.min(100, enemy.mana * 2) + "%";
+    document.getElementById("enemy-hp").textContent = "HP: " + Math.max(0, enemy.hp);
+    document.getElementById("enemy-mana").textContent = "Mana: " + Math.max(0, enemy.mana);
   }
 </script>
-
 </body>
 </html>
