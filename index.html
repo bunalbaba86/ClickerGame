@@ -106,6 +106,19 @@
     button.attack-btn:hover {
       background-color: #ffb997;
     }
+    #status-bar {
+      max-width: 500px;
+      margin: 60px auto 10px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: space-around;
+      color: #fbb03b;
+      font-weight: bold;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -116,6 +129,13 @@
   <button onclick="connectWallet()">Connect Wallet</button>
   <button onclick="withdrawTokens()">Withdraw</button>
   <button onclick="claimTokens(1000)">Claim 1000 Score</button> <!-- Örnek -->
+</div>
+
+<!-- STATUS BAR: Token Balance, Game Earnings, Score -->
+<div id="status-bar">
+  <div id="token-balance">Token Balance: 0 Z1N3D</div>
+  <div id="game-balance">Game Earnings: 0 Z1N3D</div>
+  <div id="score">Score: 0</div>
 </div>
 
 <!-- MAIN MENU -->
@@ -152,12 +172,15 @@
   </div>
 </div>
 
-<!-- SCRIPT -->
 <script>
   let userAddress = null;
   let playerBalance = 0;
+  let gameBalance = 0;
+  let score = 0;
   let gameOver = false;
   let attackInProgress = false;
+
+  const BACKEND_URL = 'https://kryptomon-backend.onrender.com'; // Backend adresini kendi ortamına göre değiştir
 
   const player = {
     hp: 100,
@@ -188,6 +211,7 @@
         const accounts = await provider.send("eth_requestAccounts", []);
         userAddress = accounts[0];
         document.getElementById("wallet-address").textContent = userAddress;
+        await updateTokenBalance();
         logMessage("Wallet connected: " + userAddress);
       } catch (err) {
         alert("Wallet connection rejected.");
@@ -195,6 +219,23 @@
     } else {
       alert("Please install MetaMask!");
     }
+  }
+
+  async function updateTokenBalance() {
+    if (!userAddress) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/balance`);
+      const data = await res.json();
+      playerBalance = parseFloat(data.balance);
+      document.getElementById('token-balance').textContent = `Token Balance: ${playerBalance.toFixed(4)} Z1N3D`;
+    } catch (e) {
+      console.error('Failed to fetch balance', e);
+    }
+  }
+
+  function updateGameStatus() {
+    document.getElementById('game-balance').textContent = `Game Earnings: ${gameBalance.toFixed(4)} Z1N3D`;
+    document.getElementById('score').textContent = `Score: ${score}`;
   }
 
   function logMessage(msg) {
@@ -290,13 +331,25 @@
     attackInProgress = false;
   }
 
+  function onGameEnd(playerWon) {
+    if (playerWon) {
+      score += 100;
+      gameBalance += 0.01;
+    } else {
+      score -= 100;
+    }
+    updateGameStatus();
+    updateTokenBalance();
+  }
+
   function endGame(won) {
     gameOver = true;
     document.getElementById("main-menu").style.display = "block";
     document.getElementById("battle-interface").style.display = "none";
+    onGameEnd(won);
     if (won) {
       logMessage("🎉 You won!");
-      playerBalance += 0.01;
+      logMessage(`💰 You earned 0.01 Z1N3D token! Your game balance: ${gameBalance.toFixed(4)}`);
     } else {
       logMessage("💀 You lost!");
     }
@@ -308,6 +361,7 @@
     player.hp = 100;
     player.mana = 0;
     player.defenseActive = false;
+    player.defenseTurnsLeft = 0;
     enemy.hp = 120;
     enemy.mana = 0;
     document.getElementById("main-menu").style.display = "none";
@@ -318,18 +372,18 @@
 
   async function withdrawTokens() {
     if (!userAddress) return alert("Connect wallet first.");
-    if (playerBalance <= 0) return alert("No rewards to withdraw.");
-    const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
+    if (gameBalance <= 0) return alert("No rewards to withdraw.");
     try {
       const res = await fetch(`${BACKEND_URL}/withdraw`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: userAddress, amount: playerBalance })
+        body: JSON.stringify({ to: userAddress, amount: gameBalance })
       });
       const data = await res.json();
       if (data.status === 'success') {
         alert(`✅ Tokens sent! Tx: ${data.txHash}`);
-        playerBalance = 0;
+        gameBalance = 0;
+        updateGameStatus();
       } else {
         alert('❌ Withdraw failed!');
       }
@@ -339,20 +393,29 @@
     }
   }
 
-  async function claimTokens(score) {
-    const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
-    const response = await fetch(`${BACKEND_URL}/claim`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: userAddress, score: score })
-    });
-    const data = await response.json();
-    if (data.status === 'success') {
-      alert(`🎉 You earned ${data.amount} Z1N3D!\nTx: ${data.txHash}`);
-    } else {
-      alert(`❌ Claim failed: ${data.error}`);
+  async function claimTokens(scoreToClaim) {
+    if (!userAddress) {
+      alert("Connect wallet first.");
+      return;
+    }
+    try {
+      const response = await fetch(`${BACKEND_URL}/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: userAddress, score: scoreToClaim })
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        alert(`🎉 You earned ${data.amount} Z1N3D!\nTx: ${data.txHash}`);
+      } else {
+        alert(`❌ Claim failed: ${data.error}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Network error during claim.");
     }
   }
 </script>
+
 </body>
 </html>
