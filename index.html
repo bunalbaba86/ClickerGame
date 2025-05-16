@@ -1,165 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Kryptomon Battle Game</title>
-
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-<style>
-  body {
-    font-family: sans-serif;
-    background-image: url('my_image.jpg');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    margin: 0; padding: 0;
-  }
-  #wallet-bar {
-    position: fixed;
-    top: 10px; right: 10px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  #wallet-bar button {
-    background-color: #fbb03b;
-    border: none;
-    color: black;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  #game-log {
-    margin: 80px auto 20px;
-    padding: 15px;
-    background-color: rgba(0,0,0,0.6);
-    border-radius: 10px;
-    max-width: 500px;
-    font-size: 1rem;
-    min-height: 80px;
-    overflow-y: auto;
-    height: 120px;
-  }
-  #main-menu {
-    text-align: center;
-    margin-top: 150px;
-  }
-  #main-menu button {
-    background-color: orange;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
-    font-weight: bold;
-    margin: 10px;
-  }
-  .character-wrapper {
-    display: flex;
-    justify-content: space-around;
-    max-width: 1000px;
-    margin: 0 auto 40px;
-    padding: 10px;
-  }
-  .character {
-    background: rgba(0,0,0,0.6);
-    border-radius: 15px;
-    padding: 15px;
-    width: 220px;
-    text-align: center;
-  }
-  .bar-container {
-    background-color: #333;
-    border-radius: 12px;
-    height: 20px;
-    margin: 10px auto;
-    width: 200px;
-    overflow: hidden;
-  }
-  .health-bar {
-    background: linear-gradient(90deg, #f44336, #ff7961);
-    height: 100%;
-    transition: width 0.4s ease;
-  }
-  .mana-bar {
-    background: linear-gradient(90deg, #2196f3, #64b5f6);
-    height: 100%;
-    transition: width 0.4s ease;
-  }
-  button.attack-btn {
-    background-color: #ff7e5f;
-    border: none;
-    color: black;
-    font-weight: bold;
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
-  button.attack-btn:hover {
-    background-color: #ffb997;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kryptomon Battle Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-image: url('my_image.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      margin: 0; padding: 0;
+    }
+    #wallet-bar {
+      position: fixed;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #wallet-bar button {
+      background-color: #fbb03b;
+      border: none;
+      color: black;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #game-log {
+      margin: 80px auto 20px;
+      padding: 15px;
+      background-color: rgba(0,0,0,0.6);
+      border-radius: 10px;
+      max-width: 500px;
+      font-size: 1rem;
+      min-height: 80px;
+      overflow-y: auto;
+      height: 120px;
+    }
+    #main-menu {
+      text-align: center;
+      margin-top: 150px;
+    }
+    #main-menu button {
+      background-color: orange;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+      margin: 10px;
+    }
+    .character-wrapper {
+      display: flex;
+      justify-content: space-around;
+      max-width: 1000px;
+      margin: 0 auto 40px;
+      padding: 10px;
+    }
+    .character {
+      background: rgba(0,0,0,0.6);
+      border-radius: 15px;
+      padding: 15px;
+      width: 220px;
+      text-align: center;
+    }
+    .bar-container {
+      background-color: #333;
+      border-radius: 12px;
+      height: 20px;
+      margin: 10px auto;
+      width: 200px;
+      overflow: hidden;
+    }
+    .health-bar {
+      background: linear-gradient(90deg, #f44336, #ff7961);
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+    .mana-bar {
+      background: linear-gradient(90deg, #2196f3, #64b5f6);
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+    button.attack-btn {
+      background-color: #ff7e5f;
+      border: none;
+      color: black;
+      font-weight: bold;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    button.attack-btn:hover {
+      background-color: #ffb997;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Wallet bar -->
-  <div id="wallet-bar">
-    <span id="wallet-address">Not connected</span>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <button onclick="withdrawTokens()">Withdraw</button>
-  </div>
+<!-- WALLET BAR -->
+<div id="wallet-bar">
+  <span id="wallet-address">Not connected</span>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <button onclick="withdrawTokens()">Withdraw</button>
+  <button onclick="claimTokens(1000)">Claim 1000 Score</button> <!-- Örnek -->
+</div>
 
-  <!-- Main menu -->
-  <div id="main-menu">
-    <h1>🔥 Kryptomon Battle Game 🔥</h1>
-    <button onclick="startGame()">START</button>
-  </div>
+<!-- MAIN MENU -->
+<div id="main-menu">
+  <h1>🔥 Kryptomon Battle Game 🔥</h1>
+  <button onclick="startGame()">START</button>
+</div>
 
-  <!-- Game log -->
-  <div id="game-log"></div>
+<!-- GAME LOG -->
+<div id="game-log"></div>
 
-  <!-- Battle interface -->
-  <div class="character-wrapper" id="battle-interface" style="display:none;">
-    <div class="character" id="player-info">
-      <h2>Trainer Bob</h2>
-      <div class="bar-container">
-        <div class="health-bar" id="player-health-bar" style="width: 100%;"></div>
-      </div>
-      <div class="bar-container">
-        <div class="mana-bar" id="player-mana-bar" style="width: 0%;"></div>
-      </div>
-      <p id="player-hp">HP: 100</p>
-      <p id="player-mana">Mana: 0</p>
-      <div>
-        <button class="attack-btn" onclick="attack(0)">Fireball</button>
-        <button class="attack-btn" onclick="attack(1)">Punch</button>
-        <button class="attack-btn" onclick="attack(2)">Howl</button>
-        <button class="attack-btn" onclick="useDefense()">Defense Spell</button>
-      </div>
-    </div>
-
-    <div class="character" id="enemy-info">
-      <h2>Ghost Trainer</h2>
-      <div class="bar-container">
-        <div class="health-bar" id="enemy-health-bar" style="width: 100%;"></div>
-      </div>
-      <div class="bar-container">
-        <div class="mana-bar" id="enemy-mana-bar" style="width: 0%;"></div>
-      </div>
-      <p id="enemy-hp">HP: 100</p>
-      <p id="enemy-mana">Mana: 0</p>
+<!-- BATTLE UI -->
+<div class="character-wrapper" id="battle-interface" style="display:none;">
+  <div class="character" id="player-info">
+    <h2>Trainer Bob</h2>
+    <div class="bar-container"><div class="health-bar" id="player-health-bar" style="width: 100%;"></div></div>
+    <div class="bar-container"><div class="mana-bar" id="player-mana-bar" style="width: 0%;"></div></div>
+    <p id="player-hp">HP: 100</p>
+    <p id="player-mana">Mana: 0</p>
+    <div>
+      <button class="attack-btn" onclick="attack(0)">Fireball</button>
+      <button class="attack-btn" onclick="attack(1)">Punch</button>
+      <button class="attack-btn" onclick="attack(2)">Howl</button>
+      <button class="attack-btn" onclick="useDefense()">Defense Spell</button>
     </div>
   </div>
+
+  <div class="character" id="enemy-info">
+    <h2>Ghost Trainer</h2>
+    <div class="bar-container"><div class="health-bar" id="enemy-health-bar" style="width: 100%;"></div></div>
+    <div class="bar-container"><div class="mana-bar" id="enemy-mana-bar" style="width: 0%;"></div></div>
+    <p id="enemy-hp">HP: 100</p>
+    <p id="enemy-mana">Mana: 0</p>
+  </div>
+</div>
+
+<!-- SCRIPT -->
 <script>
   let userAddress = null;
   let playerBalance = 0;
@@ -181,8 +174,6 @@
   const enemy = {
     hp: 120,
     mana: 0,
-    defenseActive: false,
-    defenseTurnsLeft: 0,
     attacks: [
       { name: "Bite", damage: 15, manaCost: 10 },
       { name: "Claw", damage: 10, manaCost: 5 },
@@ -190,7 +181,6 @@
     ]
   };
 
-  // Connect Metamask wallet
   async function connectWallet() {
     if (window.ethereum) {
       try {
@@ -207,7 +197,6 @@
     }
   }
 
-  // Log message helper
   function logMessage(msg) {
     const log = document.getElementById("game-log");
     const line = document.createElement("div");
@@ -216,20 +205,17 @@
     log.scrollTop = log.scrollHeight;
   }
 
-  // Update bars & status UI
   function updateBars() {
     document.getElementById("player-health-bar").style.width = Math.max(0, player.hp) + "%";
     document.getElementById("player-mana-bar").style.width = Math.min(100, player.mana * 2) + "%";
     document.getElementById("player-hp").textContent = "HP: " + Math.max(0, player.hp);
     document.getElementById("player-mana").textContent = "Mana: " + Math.max(0, player.mana);
-
     document.getElementById("enemy-health-bar").style.width = Math.max(0, enemy.hp) + "%";
     document.getElementById("enemy-mana-bar").style.width = Math.min(100, enemy.mana * 2) + "%";
     document.getElementById("enemy-hp").textContent = "HP: " + Math.max(0, enemy.hp);
     document.getElementById("enemy-mana").textContent = "Mana: " + Math.max(0, enemy.mana);
   }
 
-  // Player attack action
   function attack(index) {
     if (attackInProgress || gameOver) return;
     const atk = player.attacks[index];
@@ -238,166 +224,135 @@
       return;
     }
     attackInProgress = true;
-
     player.mana -= atk.manaCost;
     if (atk.manaGain) player.mana = Math.min(player.mana + atk.manaGain, 50);
-
     const isCritical = Math.random() < 0.25;
     const damage = (atk.damage || 0) * (isCritical ? 2 : 1);
-
     if (damage > 0) {
       enemy.hp -= damage;
       logMessage(`You used ${atk.name}!${isCritical ? " CRITICAL HIT!" : ""} Damage: ${damage}`);
     } else {
       logMessage(`You used ${atk.name}! Mana restored.`);
     }
-
     updateBars();
-
     if (enemy.hp <= 0) {
       endGame(true);
       return;
     }
-
     setTimeout(enemyTurn, 1000);
   }
 
-  // Player uses defense spell
   function useDefense() {
     if (attackInProgress || gameOver) return;
-    const defenseCost = 20;
-    if (player.mana < defenseCost) {
-      logMessage("Not enough mana for defense!");
+    const cost = 20;
+    if (player.mana < cost) {
+      logMessage("Not enough mana!");
       return;
     }
     attackInProgress = true;
-
-    player.mana -= defenseCost;
+    player.mana -= cost;
     player.defenseActive = true;
     player.defenseTurnsLeft = 1;
-
-    logMessage("Defense spell active! Incoming damage reduced by 90%.");
-
+    logMessage("Defense spell active.");
     updateBars();
-
     setTimeout(enemyTurn, 1000);
   }
 
-  // Enemy's turn
   function enemyTurn() {
     if (gameOver) return;
-
-    const possibleAttacks = enemy.attacks.filter(a => a.manaCost <= enemy.mana);
-    if (possibleAttacks.length === 0) {
+    const possible = enemy.attacks.filter(a => a.manaCost <= enemy.mana);
+    if (possible.length === 0) {
       enemy.mana = Math.min(enemy.mana + 10, 50);
-      logMessage("Enemy is gathering mana...");
+      logMessage("Enemy gathers mana...");
       updateBars();
       attackInProgress = false;
       return;
     }
-
-    const atk = possibleAttacks[Math.floor(Math.random() * possibleAttacks.length)];
+    const atk = possible[Math.floor(Math.random() * possible.length)];
     enemy.mana -= atk.manaCost;
-
     const isCritical = Math.random() < 0.2;
-    let damage = (atk.damage || 0) * (isCritical ? 2 : 1);
-
+    let dmg = atk.damage * (isCritical ? 2 : 1);
     if (player.defenseActive) {
-      damage = Math.ceil(damage * 0.1);
+      dmg = Math.ceil(dmg * 0.1);
       player.defenseTurnsLeft--;
       if (player.defenseTurnsLeft <= 0) {
         player.defenseActive = false;
-        logMessage("Defense spell has worn off.");
+        logMessage("Defense ended.");
       }
     }
-
-    player.hp -= damage;
-    logMessage(`Enemy used ${atk.name}!${isCritical ? " CRITICAL HIT!" : ""} Damage: ${damage}`);
-
+    player.hp -= dmg;
+    logMessage(`Enemy used ${atk.name}!${isCritical ? " CRITICAL!" : ""} Damage: ${dmg}`);
     updateBars();
-
     if (player.hp <= 0) {
       endGame(false);
       return;
     }
-
     attackInProgress = false;
   }
 
-  // End game handler
-  function endGame(playerWon) {
+  function endGame(won) {
     gameOver = true;
     document.getElementById("main-menu").style.display = "block";
     document.getElementById("battle-interface").style.display = "none";
-
-    if (playerWon) {
-      logMessage("🎉 You won the battle!");
-      if (userAddress) {
-        playerBalance += 0.01;
-        logMessage(`💰 You earned 0.01 Z1N3D token! Your balance: ${playerBalance.toFixed(4)}`);
-      }
+    if (won) {
+      logMessage("🎉 You won!");
+      playerBalance += 0.01;
     } else {
-      logMessage("💀 You lost the battle.");
+      logMessage("💀 You lost!");
     }
   }
 
-  // Start game handler
   function startGame() {
     gameOver = false;
     attackInProgress = false;
-
     player.hp = 100;
     player.mana = 0;
     player.defenseActive = false;
-    player.defenseTurnsLeft = 0;
-
     enemy.hp = 120;
     enemy.mana = 0;
-    enemy.defenseActive = false;
-    enemy.defenseTurnsLeft = 0;
-
     document.getElementById("main-menu").style.display = "none";
     document.getElementById("battle-interface").style.display = "flex";
-
-    logMessage("🧠 Battle started! Make your move.");
+    logMessage("🧠 Battle started!");
     updateBars();
   }
 
-  // Withdraw tokens function (real token transfer on Polygon)
   async function withdrawTokens() {
-  if (!userAddress) {
-    alert("Please connect your wallet.");
-    return;
-  }
-  if (playerBalance <= 0) {
-    alert("You have no rewards to withdraw.");
-    return;
-  }
-
-  try {
+    if (!userAddress) return alert("Connect wallet first.");
+    if (playerBalance <= 0) return alert("No rewards to withdraw.");
     const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
-
-const response = await fetch(`${BACKEND_URL}/withdraw`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ to: userAddress, amount: playerBalance })
-});
-
-
-    const data = await response.json();
-
-    if (data.status === 'success') {
-      alert(`✅ Tokens sent! TxHash: ${data.txHash}`);
-      playerBalance = 0;
-    } else {
-      alert('❌ Withdraw failed!');
+    try {
+      const res = await fetch(`${BACKEND_URL}/withdraw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: userAddress, amount: playerBalance })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        alert(`✅ Tokens sent! Tx: ${data.txHash}`);
+        playerBalance = 0;
+      } else {
+        alert('❌ Withdraw failed!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('❌ Network error!');
     }
-  } catch (err) {
-    console.error(err);
-    alert('❌ Withdraw request error!');
   }
-}
 
+  async function claimTokens(score) {
+    const BACKEND_URL = 'https://kryptomon-backend.onrender.com';
+    const response = await fetch(`${BACKEND_URL}/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: userAddress, score: score })
+    });
+    const data = await response.json();
+    if (data.status === 'success') {
+      alert(`🎉 You earned ${data.amount} Z1N3D!\nTx: ${data.txHash}`);
+    } else {
+      alert(`❌ Claim failed: ${data.error}`);
+    }
+  }
 </script>
 </body>
 </html>
