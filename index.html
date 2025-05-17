@@ -139,10 +139,44 @@
     <button onclick="window.startGame()">START</button>
   </div>
 
-  <!-- Karakterler ve diğer bölümler aynı kalacak -->
+  <div class="character-wrapper" id="characters">
+    <!-- Placeholder for character display -->
+    <div class="character">Player</div>
+    <div class="character">Enemy</div>
+  </div>
 
 <script>
 let lastAttackTime = 0;
+
+window.connectWallet = async function() {
+  try {
+    if (!window.ethereum) return alert("Please install MetaMask");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    window.userAddress = address;
+    document.getElementById("wallet-address").textContent = address.slice(0,6) + "..." + address.slice(-4);
+    window.fetchZ1n3dBalance();
+  } catch (err) {
+    console.error("Wallet connection failed:", err);
+  }
+};
+
+window.startGame = function() {
+  const wrapper = document.querySelector(".character-wrapper");
+  if (!wrapper) {
+    console.error("Character wrapper not found");
+    return;
+  }
+  document.getElementById("main-menu").style.display = "none";
+  wrapper.style.display = "flex";
+  window.gameEnded = false;
+  window.gameScore = 0;
+  window.earnedTokens = 0;
+  document.getElementById("score-count").textContent = "Score: 0";
+  window.log("Game started!");
+};
 
 window.attack = function(attackIndex) {
   const now = Date.now();
@@ -194,12 +228,12 @@ window.fetchZ1n3dBalance = async function() {
 };
 
 window.enemyAttack = function() {
-  if (window.gameEnded) return; // Oyun bittiyse saldırma
+  if (window.gameEnded) return;
   // mevcut saldırı kodları devam eder
 };
 
 window.calculateTokens = function(score) {
-  return score / 10000; // 100 puan = 0.01 token
+  return score / 10000;
 };
 
 window.endGame = async function(win) {
@@ -207,7 +241,7 @@ window.endGame = async function(win) {
   clearInterval(window.enemyInterval);
   window.log(win ? "You won! Congratulations!" : "You lost! Try again!");
   let points = 0;
-  if (win) points = 100; // Kazanınca 100 puan sabit
+  if (win) points = 100;
   window.gameScore += points;
   window.updateBars();
 
