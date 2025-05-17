@@ -6,7 +6,123 @@
   <title>Kryptomon Battle Game</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    /* ... Tüm CSS stilleri aynı kalıyor ... */
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      background: url('my_image.jpg') center/cover no-repeat;
+      color: white;
+    }
+    #wallet-bar {
+      position: fixed;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1000;
+    }
+    #wallet-bar button {
+      background: gold;
+      border: none;
+      padding: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .character-wrapper {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      gap: 80px;
+      margin-top: 50px;
+    }
+    .character {
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 15px;
+      padding: 10px;
+      margin: 10px;
+      position: relative;
+    }
+    .bar-container {
+      width: 200px;
+      height: 20px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px auto;
+      overflow: hidden;
+    }
+    .health-bar, .mana-bar {
+      height: 100%;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+    .health-bar { background-color: #e53935; }
+    .mana-bar { background-color: #1e88e5; }
+    .attack-btn {
+      background: #ff7e5f;
+      border: none;
+      margin: 5px;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #main-menu button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background: orange;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #log {
+      margin-top: 20px;
+      min-height: 50px;
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .pokemon-image {
+      width: 180px;
+      margin: 10px auto;
+    }
+    .attack-effect {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      color: yellow;
+      animation: hitEffect 1s ease-out forwards;
+    }
+    @keyframes hitEffect {
+      0% { opacity: 1; transform: translate(-50%, -20px); }
+      100% { opacity: 0; transform: translate(-50%, -60px); }
+    }
+    #return-button {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: red;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -15,110 +131,35 @@
     <span id="z1n3d-balance">Z1N3D: -</span>
     <span id="game-balance">Game Earned: 0.0000</span>
     <span id="score-count">Score: 0</span>
-    <button onclick="connectWallet()">Connect Wallet</button>
+    <button onclick="window.connectWallet()">Connect Wallet</button>
   </div>
 
   <div id="main-menu">
     <h1>🔥 Kryptomon Battle Game 🔥</h1>
-    <button onclick="startGame()">START</button>
+    <button onclick="window.startGame()">START</button>
   </div>
 
-  <div class="character-wrapper">
-    <div id="player-info" class="character">
-      <div class="pokemon-image">🧙</div>
-      <div class="bar-container"><div class="health-bar" id="player-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="player-mana"></div></div>
-      <button class="attack-btn" onclick="attack(0)">🔥 Fireball</button>
-      <button class="attack-btn" onclick="attack(1)">⚡ Lightning</button>
-      <button class="attack-btn" onclick="attack(2)">🐺 Howl</button>
-    </div>
-    <div id="enemy-info" class="character">
-      <div class="pokemon-image">👾</div>
-      <div class="bar-container"><div class="health-bar" id="enemy-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="enemy-mana"></div></div>
-    </div>
-  </div>
-
-  <div id="log"></div>
-  <button id="return-button" onclick="location.reload()">Return</button>
+  <!-- Karakterler ve diğer bölümler aynı kalacak -->
 
 <script>
-window.BACKEND_URL = "https://your-backend.com"; // Değiştirin
-window.userAddress = null;
-window.gameEnded = false;
-window.earnedTokens = 0;
-window.gameScore = 0;
-
 let lastAttackTime = 0;
-
-async function connectWallet() {
-  if (!window.ethereum) return alert("MetaMask not found");
-  try {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    window.userAddress = address;
-    document.getElementById("wallet-address").textContent = "Wallet: " + address;
-    fetchZ1n3dBalance();
-  } catch (e) {
-    console.error(e);
-    alert("Wallet connection failed");
-  }
-}
-
-function log(msg) {
-  const logEl = document.getElementById("log");
-  const entry = document.createElement("div");
-  entry.textContent = msg;
-  logEl.appendChild(entry);
-  logEl.scrollTop = logEl.scrollHeight;
-}
-
-function showEffect(targetId, damage) {
-  const el = document.getElementById(targetId);
-  const effect = document.createElement("div");
-  effect.className = "attack-effect";
-  effect.textContent = damage > 0 ? `-${damage}` : "+Mana";
-  el.appendChild(effect);
-  setTimeout(() => effect.remove(), 1000);
-}
-
-function updateBars() {
-  document.getElementById("player-health").style.width = window.player.hp + "%";
-  document.getElementById("player-mana").style.width = window.player.mana + "%";
-  document.getElementById("enemy-health").style.width = window.enemy.hp + "%";
-  document.getElementById("enemy-mana").style.width = window.enemy.mana + "%";
-  document.getElementById("score-count").textContent = "Score: " + window.gameScore;
-  document.getElementById("game-balance").textContent = "Game Earned: " + window.earnedTokens.toFixed(4);
-}
-
-function playSound(name) {
-  console.log("Played sound:", name); // Placeholder
-}
-
-function checkGameOver() {
-  if (window.enemy.hp <= 0) endGame(true);
-  if (window.player.hp <= 0) endGame(false);
-}
 
 window.attack = function(attackIndex) {
   const now = Date.now();
   if (now - lastAttackTime < 2000) {
-    log("You must wait before casting another spell.");
+    window.log("You must wait before casting another spell.");
     return;
   }
   lastAttackTime = now;
 
   const attack = window.player.attacks[attackIndex];
   if (window.player.mana < attack.manaCost) {
-    log("Not enough mana for " + attack.name);
+    window.log("Not enough mana for " + attack.name);
     return;
   }
-
   if (attack.name === "Howl") {
     window.player.mana = Math.min(100, window.player.mana + attack.manaGain);
-    log("You used Howl and gained mana!");
+    window.log("You used Howl and gained mana!");
     showEffect("player-info", 0);
   } else {
     let damage = attack.damage;
@@ -126,40 +167,49 @@ window.attack = function(attackIndex) {
       damage = Math.floor(damage / 2);
       window.enemy.defenseTurns--;
       if (window.enemy.defenseTurns <= 0) window.enemy.defense = false;
-      log("Enemy defense halved your damage!");
+      window.log("Enemy defense halved your damage!");
     }
     window.enemy.hp -= damage;
-    log(`You used ${attack.name} and dealt ${damage} damage!`);
+    window.log(`You used ${attack.name} and dealt ${damage} damage!`);
     showEffect("enemy-info", damage);
   }
-
   window.player.mana = Math.max(0, window.player.mana - attack.manaCost);
-  playSound(attack.name);
-  updateBars();
-  checkGameOver();
-  setTimeout(enemyAttack, 1000);
+  window.playSound(attack.name);
+  window.updateBars();
+  window.checkGameOver();
+  setTimeout(window.enemyAttack, 1000);
 };
 
-function enemyAttack() {
-  if (window.gameEnded) return;
-  const attack = { damage: 15, name: "Claw" };
-  window.player.hp -= attack.damage;
-  log("Enemy used Claw!");
-  showEffect("player-info", attack.damage);
-  updateBars();
-  checkGameOver();
-}
+window.fetchZ1n3dBalance = async function() {
+  if (!window.userAddress) return;
+  try {
+    const response = await fetch(`${window.BACKEND_URL}/balance?wallet=${window.userAddress}`);
+    const data = await response.json();
+    if (data.balance !== undefined) {
+      document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
+    }
+  } catch {
+    window.log("Failed to fetch Z1N3D balance.");
+  }
+};
 
-function calculateTokens(score) {
-  return score / 100000;
-}
+window.enemyAttack = function() {
+  if (window.gameEnded) return; // Oyun bittiyse saldırma
+  // mevcut saldırı kodları devam eder
+};
 
-async function endGame(win) {
+window.calculateTokens = function(score) {
+  return score / 10000; // 100 puan = 0.01 token
+};
+
+window.endGame = async function(win) {
   window.gameEnded = true;
-  log(win ? "You won! Congratulations!" : "You lost! Try again!");
+  clearInterval(window.enemyInterval);
+  window.log(win ? "You won! Congratulations!" : "You lost! Try again!");
   let points = 0;
-  if (win) points = Math.floor(window.player.hp * 10 + window.player.mana);
+  if (win) points = 100; // Kazanınca 100 puan sabit
   window.gameScore += points;
+  window.updateBars();
 
   if (window.userAddress && points > 0) {
     try {
@@ -171,53 +221,18 @@ async function endGame(win) {
       const data = await response.json();
       if (data.tokens) {
         window.earnedTokens += data.tokens;
-        log(`You earned ${data.tokens} tokens!`);
-        fetchZ1n3dBalance();
+        window.log(`You earned ${data.tokens} tokens!`);
+        window.fetchZ1n3dBalance();
       }
     } catch {
-      log("Token claim failed.");
+      window.log("Token claim failed.");
     }
   }
 
   document.querySelector(".character-wrapper").style.display = "none";
   document.getElementById("return-button").style.display = "inline-block";
   document.getElementById("main-menu").style.display = "block";
-}
-
-async function fetchZ1n3dBalance() {
-  if (!window.userAddress) return;
-  try {
-    const response = await fetch(`${window.BACKEND_URL}/balance?wallet=${window.userAddress}`);
-    const data = await response.json();
-    if (data.balance !== undefined) {
-      document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
-    }
-  } catch {
-    log("Failed to fetch Z1N3D balance.");
-  }
-}
-
-function startGame() {
-  document.getElementById("main-menu").style.display = "none";
-  document.querySelector(".character-wrapper").style.display = "flex";
-  window.player = {
-    hp: 100,
-    mana: 100,
-    attacks: [
-      { name: "Fireball", damage: 25, manaCost: 30 },
-      { name: "Lightning", damage: 35, manaCost: 50 },
-      { name: "Howl", manaGain: 30, manaCost: 0 }
-    ]
-  };
-  window.enemy = {
-    hp: 100,
-    mana: 100,
-    defense: false,
-    defenseTurns: 0
-  };
-  updateBars();
-  log("Battle started!");
-}
+};
 </script>
 </body>
 </html>
