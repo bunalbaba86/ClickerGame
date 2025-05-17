@@ -173,123 +173,124 @@
   <audio id="bg-music" src="background.mp3" loop></audio>
 
 <script>
-// GÜNCELLEMELER: spam engel, animasyonlar, müzik kontrolü, ana menü dönüşü, zeki bot
-let attackInProgress = false;
-window.attack = function(i) {
-  if (attackInProgress) return;
-  attackInProgress = true;
+// --- GLOBAL NESNELERİ TANIMLA ---
+window.player = {
+  hp: 100,
+  mana: 0,
+  defense: false,
+  defenseTurns: 0,
+  attacks: [
+    { name: "Fireball", damage: 30, manaCost: 30, manaGain: 0 },
+    { name: "Punch", damage: 10, manaCost: 10, manaGain: 5 },
+    { name: "Howl", damage: 0, manaCost: 20, manaGain: 20 }
+  ]
+};
 
-  const atk = window.player.attacks[i];
-  if (window.player.mana < atk.manaCost) {
-    window.log("Not enough mana!");
-    attackInProgress = false;
+window.enemy = {
+  hp: 120,
+  mana: 0,
+  defense: false,
+  defenseTurns: 0,
+  attacks: [
+    { name: "Fireball", damage: 25, manaCost: 30, manaGain: 0 },
+    { name: "Punch", damage: 15, manaCost: 10, manaGain: 5 },
+    { name: "Howl", damage: 0, manaCost: 20, manaGain: 20 }
+  ]
+};
+
+window.gameScore = 0;
+window.earnedTokens = 0;
+window.userAddress = null;
+window.BACKEND_URL = "https://your-backend-api-url.com"; // Bunu kendi backend URL'inle değiştir
+
+// --- CONNECT WALLET FONKSİYONU ---
+window.connectWallet = async function() {
+  if (!window.ethereum) {
+    alert("Please install MetaMask or another Ethereum wallet!");
     return;
   }
-  window.player.mana -= atk.manaCost;
-  if (atk.manaGain) window.player.mana += atk.manaGain;
-  let dmg = atk.damage;
-  const crit = Math.random() < 0.25;
-  if (crit) dmg *= 2;
-  window.enemy.hp -= dmg;
-  window.playSound(atk.name);
-  showEffect("enemy-img", dmg);
-  window.log(`You used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
-  window.updateBars();
-  if (window.enemy.hp <= 0) return window.endGame(true);
-  setTimeout(window.enemyTurn, 1000);
-}
-
-window.useDefense = function() {
-  if (attackInProgress) return;
-  attackInProgress = true;
-  if (window.player.mana < 20) {
-    window.log("Not enough mana!");
-    attackInProgress = false;
-    return;
+  try {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    window.userAddress = accounts[0];
+    document.getElementById("wallet-address").textContent = "Wallet: " + window.userAddress;
+    window.log("Wallet connected: " + window.userAddress);
+    window.fetchZ1n3dBalance();
+  } catch (error) {
+    console.error(error);
+    window.log("Wallet connection failed.");
   }
-  window.player.mana -= 20;
-  window.player.defense = true;
-  window.player.defenseTurns = 1;
-  window.playSound("Defend");
-  window.log("Defense spell active!");
-  window.updateBars();
-  setTimeout(window.enemyTurn, 1000);
-}
+};
 
-window.enemyTurn = function() {
-  const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana);
-  const atk = canAttack.length ? canAttack[Math.floor(Math.random() * canAttack.length)] : null;
-
-  if (!atk) {
-    window.enemy.mana += 15;
-    window.log("Enemy charges mana...");
-    attackInProgress = false;
-    return;
-  }
-  window.enemy.mana -= atk.manaCost;
-  let dmg = atk.damage;
-  const crit = Math.random() < 0.2;
-  if (crit) dmg *= 2;
-  if (window.player.defense) {
-    dmg = Math.ceil(dmg * 0.1);
-    window.player.defenseTurns--;
-    if (window.player.defenseTurns <= 0) window.player.defense = false;
-  }
-  window.player.hp -= dmg;
-  window.playSound(atk.name);
-  showEffect("player-img", dmg);
-  window.log(`Enemy used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
-  window.updateBars();
-  attackInProgress = false;
-  if (window.player.hp <= 0) window.endGame(false);
-}
-
-function showEffect(targetId, text) {
-  const el = document.getElementById(targetId);
-  const fx = document.createElement("div");
-  fx.className = "attack-effect";
-  fx.textContent = text > 0 ? `-${text}` : "+Mana";
-  el.parentNode.appendChild(fx);
-  setTimeout(() => fx.remove(), 1000);
-}
-
-window.endGame = async function(win) {
-  document.querySelector(".character-wrapper").style.display = "none";
-  document.getElementById("return-button").style.display = "inline-block";
-  window.log(win ? "🎉 You won!" : "💀 You lost!");
-  document.getElementById("bg-music").pause();
-  const points = win ? 100 : -100;
-  window.gameScore += points;
-  window.updateBars();
-  if (window.userAddress && points > 0) {
-    const response = await fetch(window.BACKEND_URL + "/claim", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ wallet: window.userAddress, score: points })
-    });
+// --- Z1N3D BAKİYE GETİR ---
+window.fetchZ1n3dBalance = async function() {
+  if (!window.userAddress) return;
+  // Örnek: Backend'e kullanıcı adresi ile bakiye isteği gönder
+  try {
+    const response = await fetch(window.BACKEND_URL + "/balance?wallet=" + window.userAddress);
     const data = await response.json();
-    if (data.status === "success") {
-      window.log(`💰 You earned ${data.amount} Z1N3D`);
-      window.earnedTokens += parseFloat(data.amount);
-      window.fetchZ1n3dBalance();
-    } else {
-      window.log("❌ Claim error: " + data.error);
+    if (data.balance !== undefined) {
+      document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
     }
+  } catch {
+    window.log("Failed to fetch Z1N3D balance.");
   }
-}
+};
 
-window.returnToMenu = function() {
-  document.getElementById("main-menu").style.display = "block";
-  document.getElementById("return-button").style.display = "none";
-  document.getElementById("log").innerHTML = "";
-}
+// --- LOG YAZDIR ---
+window.log = function(text) {
+  const logDiv = document.getElementById("log");
+  logDiv.innerHTML += text + "<br>";
+  logDiv.scrollTop = logDiv.scrollHeight;
+};
 
+// --- BARS GÜNCELLE ---
+window.updateBars = function() {
+  // Player
+  const playerHpPercent = Math.max(0, window.player.hp) / 100 * 100;
+  const playerManaPercent = Math.min(100, window.player.mana);
+  document.getElementById("player-health").style.width = playerHpPercent + "%";
+  document.getElementById("player-mana").style.width = playerManaPercent + "%";
+  document.getElementById("player-hp").textContent = `HP: ${Math.max(0, window.player.hp)}`;
+  document.getElementById("player-mp").textContent = `Mana: ${Math.min(100, window.player.mana)}`;
+
+  // Enemy
+  const enemyHpPercent = Math.max(0, window.enemy.hp) / 120 * 100;
+  const enemyManaPercent = Math.min(100, window.enemy.mana);
+  document.getElementById("enemy-health").style.width = enemyHpPercent + "%";
+  document.getElementById("enemy-mana").style.width = enemyManaPercent + "%";
+  document.getElementById("enemy-hp").textContent = `HP: ${Math.max(0, window.enemy.hp)}`;
+  document.getElementById("enemy-mp").textContent = `Mana: ${Math.min(100, window.enemy.mana)}`;
+
+  // Skor
+  document.getElementById("score-count").textContent = "Score: " + window.gameScore.toFixed(0);
+};
+
+// --- SES OYNAT ---
+window.playSound = function(name) {
+  const sounds = {
+    Fireball: "fire-sound",
+    Punch: "punch-sound",
+    Howl: "basic-sound",
+    Defend: "defense-sound"
+  };
+  const soundId = sounds[name];
+  if (soundId) {
+    const audio = document.getElementById(soundId);
+    audio.currentTime = 0;
+    audio.play();
+  }
+};
+
+// --- startGame fonksiyonunu güncelledim ---
 window.startGame = function() {
   window.player.hp = 100;
   window.player.mana = 0;
   window.player.defense = false;
+  window.player.defenseTurns = 0;
   window.enemy.hp = 120;
   window.enemy.mana = 0;
+  window.enemy.defense = false;
+  window.enemy.defenseTurns = 0;
   attackInProgress = false;
   document.getElementById("main-menu").style.display = "none";
   document.querySelector(".character-wrapper").style.display = "flex";
@@ -297,7 +298,11 @@ window.startGame = function() {
   document.getElementById("bg-music").play();
   window.log("Game started!");
   window.updateBars();
-}
+};
+
+// (Mevcut diğer fonksiyonlar: attack, useDefense, enemyTurn, showEffect, endGame, returnToMenu aynen kalabilir)
+
 </script>
+
 </body>
 </html>
