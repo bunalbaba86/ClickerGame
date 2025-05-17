@@ -180,9 +180,9 @@ window.player = {
   defense: false,
   defenseTurns: 0,
   attacks: [
-    { name: "Fireball", damage: 30, manaCost: 30, manaGain: 0 },
-    { name: "Punch", damage: 10, manaCost: 10, manaGain: 5 },
-    { name: "Howl", damage: 0, manaCost: 20, manaGain: 20 }
+    { name: "Fireball", damage: 35, manaCost: 30, manaGain: 0 },
+    { name: "Punch", damage: 10, manaCost: 10, manaGain: 0 },
+    { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
   ]
 };
 
@@ -192,9 +192,9 @@ window.enemy = {
   defense: false,
   defenseTurns: 0,
   attacks: [
-    { name: "Fireball", damage: 25, manaCost: 30, manaGain: 0 },
-    { name: "Punch", damage: 15, manaCost: 10, manaGain: 5 },
-    { name: "Howl", damage: 0, manaCost: 20, manaGain: 20 }
+    { name: "Fireball", damage: 35, manaCost: 30, manaGain: 0 },
+    { name: "Punch", damage: 15, manaCost: 10, manaGain: 0 },
+    { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
   ]
 };
 
@@ -325,34 +325,72 @@ window.useDefense = function() {
   setTimeout(window.enemyTurn, 1000);
 }
 
-// --- Enemy hamlesi ---
 window.enemyTurn = function() {
-  const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana);
-  const atk = canAttack.length ? canAttack[Math.floor(Math.random() * canAttack.length)] : null;
+  // Spam engelleme
+  if (attackInProgress) return;
+  attackInProgress = true;
+
+  // Eğer canı %30'un altındaysa ve mana varsa savunma yap
+  if (window.enemy.hp / 120 < 0.3 && window.enemy.mana >= 20 && !window.enemy.defense) {
+    window.enemy.mana -= 20;
+    window.enemy.defense = true;
+    window.enemy.defenseTurns = 1;
+    window.playSound("Defend");
+    window.log("Enemy used Defense!");
+    window.updateBars();
+    attackInProgress = false;
+    return;
+  }
+
+  // Kullanabileceği büyüler arasından en güçlü hasar veren büyüyü seç (mana yetiyorsa)
+  const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana && a.damage > 0);
+  let atk = null;
+  if (canAttack.length) {
+    // En yüksek hasar veren saldırıyı bul
+    atk = canAttack.reduce((max, a) => a.damage > max.damage ? a : max, canAttack[0]);
+  }
 
   if (!atk) {
+    // Eğer saldırı yapamıyorsa mana kazanma büyüsü varsa onu kullan
+    const manaGainAttack = window.enemy.attacks.find(a => a.manaGain > 0);
+    if (manaGainAttack) {
+      window.enemy.mana += manaGainAttack.manaGain;
+      window.log("Enemy used " + manaGainAttack.name + " to gain mana.");
+      window.updateBars();
+      attackInProgress = false;
+      return;
+    }
+
+    // Mana kazanma büyüsü yoksa mana yükle
     window.enemy.mana += 15;
     window.log("Enemy charges mana...");
     attackInProgress = false;
     return;
   }
+
+  // Saldırıyı uygula
   window.enemy.mana -= atk.manaCost;
   let dmg = atk.damage;
   const crit = Math.random() < 0.2;
   if (crit) dmg *= 2;
+
   if (window.player.defense) {
     dmg = Math.ceil(dmg * 0.1);
     window.player.defenseTurns--;
     if (window.player.defenseTurns <= 0) window.player.defense = false;
   }
+
   window.player.hp -= dmg;
   window.playSound(atk.name);
   showEffect("player-img", dmg);
   window.log(`Enemy used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
   window.updateBars();
+
   attackInProgress = false;
+
   if (window.player.hp <= 0) window.endGame(false);
 }
+
 
 // --- Efekt gösterimi ---
 function showEffect(targetId, text) {
