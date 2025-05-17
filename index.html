@@ -34,12 +34,11 @@
       border-radius: 8px;
     }
     .character-wrapper {
-      display: flex;
+      display: none;
       justify-content: space-between;
       align-items: center;
       gap: 80px;
       margin-top: 50px;
-      display: none;
     }
     .character {
       width: 200px;
@@ -250,16 +249,16 @@ window.updateBars = function() {
   const playerManaPercent = Math.min(100, window.player.mana);
   document.getElementById("player-health").style.width = playerHpPercent + "%";
   document.getElementById("player-mana").style.width = playerManaPercent + "%";
-  document.getElementById("player-hp").textContent = HP: ${Math.max(0, window.player.hp)};
-  document.getElementById("player-mp").textContent = Mana: ${Math.min(100, window.player.mana)};
+  document.getElementById("player-hp").textContent = `HP: ${Math.max(0, window.player.hp)}`;
+  document.getElementById("player-mp").textContent = `Mana: ${Math.min(100, window.player.mana)}`;
 
   // Enemy
   const enemyHpPercent = Math.max(0, window.enemy.hp) / 120 * 100;
   const enemyManaPercent = Math.min(100, window.enemy.mana);
   document.getElementById("enemy-health").style.width = enemyHpPercent + "%";
   document.getElementById("enemy-mana").style.width = enemyManaPercent + "%";
-  document.getElementById("enemy-hp").textContent = HP: ${Math.max(0, window.enemy.hp)};
-  document.getElementById("enemy-mp").textContent = Mana: ${Math.min(100, window.enemy.mana)};
+  document.getElementById("enemy-hp").textContent = `HP: ${Math.max(0, window.enemy.hp)}`;
+  document.getElementById("enemy-mp").textContent = `Mana: ${Math.min(100, window.enemy.mana)}`;
 
   // Skor
   document.getElementById("score-count").textContent = "Score: " + window.gameScore.toFixed(0);
@@ -280,135 +279,70 @@ window.playSound = function(name) {
     audio.play();
   }
 };
-// GÜNCELLEMELER: spam engel, animasyonlar, müzik kontrolü, ana menü dönüşü, zeki bot
-let attackInProgress = false;
-
-window.attack = function(i) {
-  if (attackInProgress) return;
-  attackInProgress = true;
-
-  const atk = window.player.attacks[i];
-
-  if (window.player.mana < atk.manaCost) {
-    window.log("Not enough mana!");
-    attackInProgress = false;
-    return;
-  }
-
-  // Mana harcaması
-  window.player.mana -= atk.manaCost;
-
-  // Mana kazancı varsa ekle
-  if (atk.manaGain) window.player.mana += atk.manaGain;
-
-  // Mana sınırı (max 100)
-  window.player.mana = Math.min(window.player.mana, 100);
-
-  // Hasar işlemleri
-  let dmg = atk.damage;
-  const crit = Math.random() < 0.25;
-  if (crit) dmg *= 2;
-
-  window.enemy.hp -= dmg;
-
-  window.playSound(atk.name);
-  showEffect("enemy-img", dmg);
-  window.log(`You used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
-
-  window.updateBars();
-
-  if (window.enemy.hp <= 0) {
-    attackInProgress = false;
-    return window.endGame(true);
-  }
-
-  setTimeout(window.enemyTurn, 1000);
-}
-
-window.useDefense = function() {
-  if (attackInProgress) return;
-  attackInProgress = true;
-  if (window.player.mana < 20) {
-    window.log("Not enough mana!");
-    attackInProgress = false;
-    return;
-  }
-  window.player.mana -= 20;
-  window.player.defense = true;
-  window.player.defenseTurns = 1;
-
-  // Mana sınırı kontrolü
-  window.player.mana = Math.min(window.player.mana, 100);
-
-  window.playSound("Defend");
-  window.log("Defense spell active!");
-  window.updateBars();
-  setTimeout(window.enemyTurn, 1000);
-}
-
-// --- Enemy hamlesi ---
-window.enemyTurn = function() {
-  // Öncelikle mana sınırını kontrol et ve aşımı önle
-  window.enemy.mana = Math.min(window.enemy.mana, 100);
-
-  // Kullanabileceği saldırılar
-  const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana);
-
-  // Eğer saldırı yoksa mana şarj et
-  if (!canAttack.length) {
-    window.enemy.mana += 15;
-    // Mana sınırını aşmaması için
-    window.enemy.mana = Math.min(window.enemy.mana, 100);
-    window.log("Enemy charges mana...");
-    attackInProgress = false;
-    return;
-  }
-
-  // Akıllı seçim: yüksek hasar veren saldırıları tercih et (mana izin verdiği sürece)
-  canAttack.sort((a, b) => b.damage - a.damage);
-  const atk = canAttack[0];
-
-  window.enemy.mana -= atk.manaCost;
-
-  let dmg = atk.damage;
-  const crit = Math.random() < 0.2;
-  if (crit) dmg *= 2;
-
-  if (window.player.defense) {
-    dmg = Math.ceil(dmg * 0.1);
-    window.player.defenseTurns--;
-    if (window.player.defenseTurns <= 0) window.player.defense = false;
-  }
-  window.player.hp -= dmg;
-  window.playSound(atk.name);
-  showEffect("player-img", dmg);
-  window.log(`Enemy used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
-  window.updateBars();
-  attackInProgress = false;
-  if (window.player.hp <= 0) window.endGame(false);
-}
-
-
-
-// --- Efekt gösterimi ---
-function showEffect(targetId, text) {
+// GÜNCELLEMELER İÇİN BASİT KOD --- 
+window.showEffect = function(targetId, text) {
   const el = document.getElementById(targetId);
   const fx = document.createElement("div");
   fx.className = "attack-effect";
-  fx.textContent = text > 0 ? -${text} : "+Mana";
+  fx.textContent = text > 0 ? `-${text}` : "+Mana";
   el.parentNode.appendChild(fx);
   setTimeout(() => fx.remove(), 1000);
-}
+};
 
-// --- Oyun bitişi ---
+// --- DÜŞMAN SALDIRISI ---
+window.enemyAttack = function() {
+  // Basit yapay zeka: Mana yeterliyse Fireball yapar, değilse Punch, mana doluysa Howl
+  let attack;
+  if (window.enemy.mana >= 30) {
+    attack = window.enemy.attacks[0]; // Fireball
+  } else if (window.enemy.mana < 100) {
+    attack = window.enemy.attacks[2]; // Howl
+  } else {
+    attack = window.enemy.attacks[1]; // Punch
+  }
+
+  if (attack.name === "Howl") {
+    window.enemy.mana = Math.min(100, window.enemy.mana + attack.manaGain);
+    window.log("Enemy used Howl and gained mana!");
+    showEffect("enemy-info", 0);
+    window.playSound(attack.name);
+  } else {
+    if (window.player.defense) {
+      window.player.hp -= Math.floor(attack.damage / 2);
+      window.player.defenseTurns--;
+      if (window.player.defenseTurns <= 0) window.player.defense = false;
+      window.log(`Enemy used ${attack.name} but your defense halved the damage!`);
+      showEffect("player-info", Math.floor(attack.damage / 2));
+    } else {
+      window.player.hp -= attack.damage;
+      window.log(`Enemy used ${attack.name} and dealt ${attack.damage} damage!`);
+      showEffect("player-info", attack.damage);
+    }
+    window.enemy.mana = Math.max(0, window.enemy.mana - attack.manaCost);
+    window.playSound(attack.name);
+  }
+  window.updateBars();
+  window.checkGameOver();
+};
+
+// --- OYUN BİTİŞİ KONTROLÜ ---
+window.checkGameOver = function() {
+  if (window.player.hp <= 0) {
+    window.endGame(false);
+  } else if (window.enemy.hp <= 0) {
+    window.endGame(true);
+  }
+};
+
+// --- OYUN BİTİŞİ ---
 window.endGame = async function(win) {
-  document.querySelector(".character-wrapper").style.display = "none";
-  document.getElementById("return-button").style.display = "inline-block";
-  window.log(win ? "🎉 You won!" : "💀 You lost!");
-  document.getElementById("bg-music").pause();
-  const points = win ? 100 : -100;
+  window.log(win ? "You won! Congratulations!" : "You lost! Try again!");
+  // Puan hesaplama
+  let points = 0;
+  if (win) points = Math.floor(window.player.hp * 10 + window.player.mana);
   window.gameScore += points;
   window.updateBars();
+  // Claim token (backend'e istek)
   if (window.userAddress && points > 0) {
     try {
       const response = await fetch(window.BACKEND_URL + "/claim", {
@@ -419,22 +353,61 @@ window.endGame = async function(win) {
       const data = await response.json();
       if (data.tokens) {
         window.earnedTokens += data.tokens;
-        window.log(You earned ${data.tokens} tokens!);
+        window.log(`You earned ${data.tokens} tokens!`);
         window.fetchZ1n3dBalance();
       }
     } catch {
       window.log("Token claim failed.");
     }
   }
-};
 
-// --- Menüyü göster ---
-window.returnToMenu = function() {
-  document.getElementById("return-button").style.display = "none";
+  // Oyun karakterlerini gizle, menüyü göster
+  document.querySelector(".character-wrapper").style.display = "none";
+  document.getElementById("return-button").style.display = "inline-block";
   document.getElementById("main-menu").style.display = "block";
 };
 
-// --- Oyunu başlat ---
+// --- SAVUNMA FONKSİYONU ---
+window.useDefense = function() {
+  window.player.defense = true;
+  window.player.defenseTurns = 2;
+  window.log("You activated defense! Damage will be halved for 2 turns.");
+  window.playSound("Defend");
+};
+
+// --- SALDIRI FONKSİYONU ---
+window.attack = function(attackIndex) {
+  const attack = window.player.attacks[attackIndex];
+  if (window.player.mana < attack.manaCost) {
+    window.log("Not enough mana for " + attack.name);
+    return;
+  }
+  if (attack.name === "Howl") {
+    window.player.mana = Math.min(100, window.player.mana + attack.manaGain);
+    window.log("You used Howl and gained mana!");
+    showEffect("player-info", 0);
+  } else {
+    let damage = attack.damage;
+    if (window.enemy.defense) {
+      damage = Math.floor(damage / 2);
+      window.enemy.defenseTurns--;
+      if (window.enemy.defenseTurns <= 0) window.enemy.defense = false;
+      window.log("Enemy defense halved your damage!");
+    }
+    window.enemy.hp -= damage;
+    window.log(`You used ${attack.name} and dealt ${damage} damage!`);
+    showEffect("enemy-info", damage);
+  }
+  window.player.mana = Math.max(0, window.player.mana - attack.manaCost);
+  window.playSound(attack.name);
+  window.updateBars();
+  window.checkGameOver();
+  setTimeout(() => {
+    window.enemyAttack();
+  }, 1000);
+};
+
+// --- OYUN BAŞLAT ---
 window.startGame = function() {
   window.player.hp = 100;
   window.player.mana = 0;
@@ -444,16 +417,21 @@ window.startGame = function() {
   window.enemy.mana = 0;
   window.enemy.defense = false;
   window.enemy.defenseTurns = 0;
-  attackInProgress = false;
-  document.getElementById("main-menu").style.display = "none";
+  window.gameScore = 0;
   document.querySelector(".character-wrapper").style.display = "flex";
-  document.getElementById("bg-music").currentTime = 0;
-  document.getElementById("bg-music").play();
-  window.log("Game started!");
+  document.getElementById("main-menu").style.display = "none";
+  document.getElementById("return-button").style.display = "none";
   window.updateBars();
+  window.log("Game started! Fight!");
+};
+
+// --- MENUYE DON ---
+window.returnToMenu = function() {
+  document.querySelector(".character-wrapper").style.display = "none";
+  document.getElementById("main-menu").style.display = "block";
+  document.getElementById("return-button").style.display = "none";
+  window.log("Returned to menu.");
 };
 </script>
-
-
 </body>
 </html>
