@@ -201,7 +201,8 @@ window.enemy = {
 window.gameScore = 0;
 window.earnedTokens = 0;
 window.userAddress = null;
-window.BACKEND_URL = "https://your-backend-api-url.com"; // Bunu kendi backend URL'inle değiştir
+// BURAYI GERÇEK BACKEND ADRESİNLE DEĞİŞTİR
+window.BACKEND_URL = "https://your-real-backend-api.com";
 
 // --- CONNECT WALLET FONKSİYONU ---
 window.connectWallet = async function() {
@@ -224,7 +225,6 @@ window.connectWallet = async function() {
 // --- Z1N3D BAKİYE GETİR ---
 window.fetchZ1n3dBalance = async function() {
   if (!window.userAddress) return;
-  // Örnek: Backend'e kullanıcı adresi ile bakiye isteği gönder
   try {
     const response = await fetch(window.BACKEND_URL + "/balance?wallet=" + window.userAddress);
     const data = await response.json();
@@ -281,7 +281,124 @@ window.playSound = function(name) {
   }
 };
 
-// --- startGame fonksiyonunu güncelledim ---
+// --- Saldırı fonksiyonu ---
+let attackInProgress = false;
+window.attack = function(i) {
+  if (attackInProgress) return;
+  attackInProgress = true;
+
+  const atk = window.player.attacks[i];
+  if (window.player.mana < atk.manaCost) {
+    window.log("Not enough mana!");
+    attackInProgress = false;
+    return;
+  }
+  window.player.mana -= atk.manaCost;
+  if (atk.manaGain) window.player.mana += atk.manaGain;
+  let dmg = atk.damage;
+  const crit = Math.random() < 0.25;
+  if (crit) dmg *= 2;
+  window.enemy.hp -= dmg;
+  window.playSound(atk.name);
+  showEffect("enemy-img", dmg);
+  window.log(`You used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
+  window.updateBars();
+  if (window.enemy.hp <= 0) return window.endGame(true);
+  setTimeout(window.enemyTurn, 1000);
+}
+
+// --- Savunma fonksiyonu ---
+window.useDefense = function() {
+  if (attackInProgress) return;
+  attackInProgress = true;
+  if (window.player.mana < 20) {
+    window.log("Not enough mana!");
+    attackInProgress = false;
+    return;
+  }
+  window.player.mana -= 20;
+  window.player.defense = true;
+  window.player.defenseTurns = 1;
+  window.playSound("Defend");
+  window.log("Defense spell active!");
+  window.updateBars();
+  setTimeout(window.enemyTurn, 1000);
+}
+
+// --- Enemy hamlesi ---
+window.enemyTurn = function() {
+  const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana);
+  const atk = canAttack.length ? canAttack[Math.floor(Math.random() * canAttack.length)] : null;
+
+  if (!atk) {
+    window.enemy.mana += 15;
+    window.log("Enemy charges mana...");
+    attackInProgress = false;
+    return;
+  }
+  window.enemy.mana -= atk.manaCost;
+  let dmg = atk.damage;
+  const crit = Math.random() < 0.2;
+  if (crit) dmg *= 2;
+  if (window.player.defense) {
+    dmg = Math.ceil(dmg * 0.1);
+    window.player.defenseTurns--;
+    if (window.player.defenseTurns <= 0) window.player.defense = false;
+  }
+  window.player.hp -= dmg;
+  window.playSound(atk.name);
+  showEffect("player-img", dmg);
+  window.log(`Enemy used ${atk.name}, dealt ${dmg} damage!${crit ? " CRIT!" : ""}`);
+  window.updateBars();
+  attackInProgress = false;
+  if (window.player.hp <= 0) window.endGame(false);
+}
+
+// --- Efekt gösterimi ---
+function showEffect(targetId, text) {
+  const el = document.getElementById(targetId);
+  const fx = document.createElement("div");
+  fx.className = "attack-effect";
+  fx.textContent = text > 0 ? `-${text}` : "+Mana";
+  el.parentNode.appendChild(fx);
+  setTimeout(() => fx.remove(), 1000);
+}
+
+// --- Oyun bitişi ---
+window.endGame = async function(win) {
+  document.querySelector(".character-wrapper").style.display = "none";
+  document.getElementById("return-button").style.display = "inline-block";
+  window.log(win ? "🎉 You won!" : "💀 You lost!");
+  document.getElementById("bg-music").pause();
+  const points = win ? 100 : -100;
+  window.gameScore += points;
+  window.updateBars();
+  if (window.userAddress && points > 0) {
+    try {
+      const response = await fetch(window.BACKEND_URL + "/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: window.userAddress, score: points }),
+      });
+      const data = await response.json();
+      if (data.tokens) {
+        window.earnedTokens += data.tokens;
+        window.log(`You earned ${data.tokens} tokens!`);
+        window.fetchZ1n3dBalance();
+      }
+    } catch {
+      window.log("Token claim failed.");
+    }
+  }
+};
+
+// --- Menüyü göster ---
+window.returnToMenu = function() {
+  document.getElementById("return-button").style.display = "none";
+  document.getElementById("main-menu").style.display = "block";
+};
+
+// --- Oyunu başlat ---
 window.startGame = function() {
   window.player.hp = 100;
   window.player.mana = 0;
@@ -299,10 +416,8 @@ window.startGame = function() {
   window.log("Game started!");
   window.updateBars();
 };
-
-// (Mevcut diğer fonksiyonlar: attack, useDefense, enemyTurn, showEffect, endGame, returnToMenu aynen kalabilir)
-
 </script>
+
 
 </body>
 </html>
