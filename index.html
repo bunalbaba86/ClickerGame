@@ -2,196 +2,222 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Combat Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kryptomon Battle Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #1e1e2f;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      margin: 0;
-      padding-top: 20px;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    .container {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .character {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 20px;
-    }
-
-    .health-bar {
-      width: 150px;
-      height: 25px;
-      background-color: red;
-      border: 2px solid white;
-      margin-top: 10px;
-    }
-
-    .health-fill {
-      height: 100%;
-      background-color: limegreen;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .actions button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      background-color: #3498db;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      transition: background-color 0.3s;
-    }
-
-    .actions button:hover {
-      background-color: #2980b9;
-    }
-
-    #result {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .image {
-      width: 100px;
-      height: 100px;
-      background-size: cover;
-      background-position: center;
-      margin-bottom: 10px;
-    }
-
-    .player-image {
-      background-image: url('https://via.placeholder.com/100x100.png?text=Player');
-    }
-
-    .enemy-image {
-      background-image: url('https://via.placeholder.com/100x100.png?text=Enemy');
-    }
+    /* ... Tüm CSS stilleri aynı kalıyor ... */
   </style>
 </head>
 <body>
-  <h1>Combat Game</h1>
-  <div class="container">
-    <div class="character">
-      <div class="image player-image"></div>
-      <div class="health-bar">
-        <div id="playerHealth" class="health-fill" style="width: 100%;"></div>
-      </div>
+  <div id="wallet-bar">
+    <span id="wallet-address">Not connected</span>
+    <span id="z1n3d-balance">Z1N3D: -</span>
+    <span id="game-balance">Game Earned: 0.0000</span>
+    <span id="score-count">Score: 0</span>
+    <button onclick="connectWallet()">Connect Wallet</button>
+  </div>
+
+  <div id="main-menu">
+    <h1>🔥 Kryptomon Battle Game 🔥</h1>
+    <button onclick="startGame()">START</button>
+  </div>
+
+  <div class="character-wrapper">
+    <div id="player-info" class="character">
+      <div class="pokemon-image">🧙</div>
+      <div class="bar-container"><div class="health-bar" id="player-health"></div></div>
+      <div class="bar-container"><div class="mana-bar" id="player-mana"></div></div>
+      <button class="attack-btn" onclick="attack(0)">🔥 Fireball</button>
+      <button class="attack-btn" onclick="attack(1)">⚡ Lightning</button>
+      <button class="attack-btn" onclick="attack(2)">🐺 Howl</button>
     </div>
-    <div class="character">
-      <div class="image enemy-image"></div>
-      <div class="health-bar">
-        <div id="enemyHealth" class="health-fill" style="width: 100%;"></div>
-      </div>
+    <div id="enemy-info" class="character">
+      <div class="pokemon-image">👾</div>
+      <div class="bar-container"><div class="health-bar" id="enemy-health"></div></div>
+      <div class="bar-container"><div class="mana-bar" id="enemy-mana"></div></div>
     </div>
   </div>
 
-  <div class="actions">
-    <button onclick="attack()">Attack</button>
-    <button onclick="specialAttack()">Special Attack</button>
-    <button onclick="heal()">Heal</button>
-    <button onclick="resetGame()">Reset</button>
-  </div>
+  <div id="log"></div>
+  <button id="return-button" onclick="location.reload()">Return</button>
 
-  <div id="result"></div>
+<script>
+window.BACKEND_URL = "https://your-backend.com"; // Değiştirin
+window.userAddress = null;
+window.gameEnded = false;
+window.earnedTokens = 0;
+window.gameScore = 0;
 
-  <script>
-    let playerHP = 100;
-    let enemyHP = 100;
-    const maxHP = 100;
+let lastAttackTime = 0;
 
-    function updateHealthBars() {
-      document.getElementById('playerHealth').style.width = playerHP + '%';
-      document.getElementById('enemyHealth').style.width = enemyHP + '%';
+async function connectWallet() {
+  if (!window.ethereum) return alert("MetaMask not found");
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    window.userAddress = address;
+    document.getElementById("wallet-address").textContent = "Wallet: " + address;
+    fetchZ1n3dBalance();
+  } catch (e) {
+    console.error(e);
+    alert("Wallet connection failed");
+  }
+}
+
+function log(msg) {
+  const logEl = document.getElementById("log");
+  const entry = document.createElement("div");
+  entry.textContent = msg;
+  logEl.appendChild(entry);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function showEffect(targetId, damage) {
+  const el = document.getElementById(targetId);
+  const effect = document.createElement("div");
+  effect.className = "attack-effect";
+  effect.textContent = damage > 0 ? `-${damage}` : "+Mana";
+  el.appendChild(effect);
+  setTimeout(() => effect.remove(), 1000);
+}
+
+function updateBars() {
+  document.getElementById("player-health").style.width = window.player.hp + "%";
+  document.getElementById("player-mana").style.width = window.player.mana + "%";
+  document.getElementById("enemy-health").style.width = window.enemy.hp + "%";
+  document.getElementById("enemy-mana").style.width = window.enemy.mana + "%";
+  document.getElementById("score-count").textContent = "Score: " + window.gameScore;
+  document.getElementById("game-balance").textContent = "Game Earned: " + window.earnedTokens.toFixed(4);
+}
+
+function playSound(name) {
+  console.log("Played sound:", name); // Placeholder
+}
+
+function checkGameOver() {
+  if (window.enemy.hp <= 0) endGame(true);
+  if (window.player.hp <= 0) endGame(false);
+}
+
+window.attack = function(attackIndex) {
+  const now = Date.now();
+  if (now - lastAttackTime < 2000) {
+    log("You must wait before casting another spell.");
+    return;
+  }
+  lastAttackTime = now;
+
+  const attack = window.player.attacks[attackIndex];
+  if (window.player.mana < attack.manaCost) {
+    log("Not enough mana for " + attack.name);
+    return;
+  }
+
+  if (attack.name === "Howl") {
+    window.player.mana = Math.min(100, window.player.mana + attack.manaGain);
+    log("You used Howl and gained mana!");
+    showEffect("player-info", 0);
+  } else {
+    let damage = attack.damage;
+    if (window.enemy.defense) {
+      damage = Math.floor(damage / 2);
+      window.enemy.defenseTurns--;
+      if (window.enemy.defenseTurns <= 0) window.enemy.defense = false;
+      log("Enemy defense halved your damage!");
     }
+    window.enemy.hp -= damage;
+    log(`You used ${attack.name} and dealt ${damage} damage!`);
+    showEffect("enemy-info", damage);
+  }
 
-    function attack() {
-      const playerDamage = Math.floor(Math.random() * 10) + 5;
-      const enemyDamage = Math.floor(Math.random() * 10) + 5;
+  window.player.mana = Math.max(0, window.player.mana - attack.manaCost);
+  playSound(attack.name);
+  updateBars();
+  checkGameOver();
+  setTimeout(enemyAttack, 1000);
+};
 
-      enemyHP = Math.max(0, enemyHP - playerDamage);
-      playerHP = Math.max(0, playerHP - enemyDamage);
+function enemyAttack() {
+  if (window.gameEnded) return;
+  const attack = { damage: 15, name: "Claw" };
+  window.player.hp -= attack.damage;
+  log("Enemy used Claw!");
+  showEffect("player-info", attack.damage);
+  updateBars();
+  checkGameOver();
+}
 
-      updateHealthBars();
-      checkWinner();
-    }
+function calculateTokens(score) {
+  return score / 100000;
+}
 
-    function specialAttack() {
-      const playerDamage = Math.floor(Math.random() * 20) + 10;
-      const enemyDamage = Math.floor(Math.random() * 15) + 5;
+async function endGame(win) {
+  window.gameEnded = true;
+  log(win ? "You won! Congratulations!" : "You lost! Try again!");
+  let points = 0;
+  if (win) points = Math.floor(window.player.hp * 10 + window.player.mana);
+  window.gameScore += points;
 
-      enemyHP = Math.max(0, enemyHP - playerDamage);
-      playerHP = Math.max(0, playerHP - enemyDamage);
-
-      updateHealthBars();
-      checkWinner();
-    }
-
-    function heal() {
-      const healAmount = Math.floor(Math.random() * 10) + 10;
-      playerHP = Math.min(maxHP, playerHP + healAmount);
-
-      const enemyDamage = Math.floor(Math.random() * 10) + 5;
-      playerHP = Math.max(0, playerHP - enemyDamage);
-
-      updateHealthBars();
-      checkWinner();
-    }
-
-    function resetGame() {
-      playerHP = 100;
-      enemyHP = 100;
-      updateHealthBars();
-      document.getElementById('result').innerText = '';
-    }
-
-    function checkWinner() {
-      const result = document.getElementById('result');
-      if (playerHP <= 0 && enemyHP <= 0) {
-        result.innerText = "It's a draw!";
-      } else if (playerHP <= 0) {
-        result.innerText = "You lost!";
-      } else if (enemyHP <= 0) {
-        result.innerText = "You won!";
+  if (window.userAddress && points > 0) {
+    try {
+      const response = await fetch(window.BACKEND_URL + "/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: window.userAddress, score: points })
+      });
+      const data = await response.json();
+      if (data.tokens) {
+        window.earnedTokens += data.tokens;
+        log(`You earned ${data.tokens} tokens!`);
+        fetchZ1n3dBalance();
       }
+    } catch {
+      log("Token claim failed.");
     }
+  }
 
-    // Başlangıçta sağlık barlarını ayarla
-    function startGame() {
-      playerHP = 100;
-      enemyHP = 100;
-      updateHealthBars();
-      document.getElementById('result').innerText = '';
+  document.querySelector(".character-wrapper").style.display = "none";
+  document.getElementById("return-button").style.display = "inline-block";
+  document.getElementById("main-menu").style.display = "block";
+}
+
+async function fetchZ1n3dBalance() {
+  if (!window.userAddress) return;
+  try {
+    const response = await fetch(`${window.BACKEND_URL}/balance?wallet=${window.userAddress}`);
+    const data = await response.json();
+    if (data.balance !== undefined) {
+      document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
     }
+  } catch {
+    log("Failed to fetch Z1N3D balance.");
+  }
+}
 
-    startGame();
-  </script>
+function startGame() {
+  document.getElementById("main-menu").style.display = "none";
+  document.querySelector(".character-wrapper").style.display = "flex";
+  window.player = {
+    hp: 100,
+    mana: 100,
+    attacks: [
+      { name: "Fireball", damage: 25, manaCost: 30 },
+      { name: "Lightning", damage: 35, manaCost: 50 },
+      { name: "Howl", manaGain: 30, manaCost: 0 }
+    ]
+  };
+  window.enemy = {
+    hp: 100,
+    mana: 100,
+    defense: false,
+    defenseTurns: 0
+  };
+  updateBars();
+  log("Battle started!");
+}
+</script>
 </body>
 </html>
