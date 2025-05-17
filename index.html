@@ -6,124 +6,7 @@
   <title>Kryptomon Battle Game</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      background: url('my_image.jpg') center/cover no-repeat;
-      color: white;
-    }
-    #wallet-bar {
-      position: fixed;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 12px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      z-index: 1000;
-    }
-    #wallet-bar button {
-      background: gold;
-      border: none;
-      padding: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-    .character-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 80px;
-      margin-top: 50px;
-      display: none;
-    }
-    .character {
-      width: 200px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      padding: 10px;
-      margin: 10px;
-      position: relative;
-    }
-    .bar-container {
-      width: 200px;
-      height: 20px;
-      background-color: #ddd;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px auto;
-      overflow: hidden;
-    }
-    .health-bar, .mana-bar {
-      height: 100%;
-      width: 100%;
-      border-radius: 5px;
-      transition: width 0.3s ease;
-    }
-    .health-bar { background-color: #e53935; }
-    .mana-bar { background-color: #1e88e5; }
-    .attack-btn {
-      background: #ff7e5f;
-      border: none;
-      margin: 5px;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #main-menu button {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      background: orange;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #log {
-      margin-top: 20px;
-      min-height: 50px;
-      background-color: rgba(0,0,0,0.5);
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .pokemon-image {
-      width: 180px;
-      margin: 10px auto;
-    }
-    .attack-effect {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      color: yellow;
-      animation: hitEffect 1s ease-out forwards;
-    }
-    @keyframes hitEffect {
-      0% { opacity: 1; transform: translate(-50%, -20px); }
-      100% { opacity: 0; transform: translate(-50%, -60px); }
-    }
-    #return-button {
-      display: none;
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: red;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    /* ... Senin mevcut CSS'in ... */
   </style>
 </head>
 <body>
@@ -140,31 +23,12 @@
     <button onclick="window.startGame()">START</button>
   </div>
 
-  <div class="character-wrapper">
-    <div class="character" id="player-info">
-      <h2>You</h2>
-      <img src="player-pokemon.png" class="pokemon-image" id="player-img" />
-      <div class="bar-container"><div class="health-bar" id="player-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="player-mana"></div></div>
-      <p id="player-hp">HP: 100</p>
-      <p id="player-mp">Mana: 0</p>
-      <button class="attack-btn" onclick="window.attack(0)">Fireball</button>
-      <button class="attack-btn" onclick="window.attack(1)">Punch</button>
-      <button class="attack-btn" onclick="window.attack(2)">Howl</button>
-      <button class="attack-btn" onclick="window.useDefense()">Defend</button>
-    </div>
-    <div class="character" id="enemy-info">
-      <h2>Enemy</h2>
-      <img src="enemy-pokemon2.png" class="pokemon-image" id="enemy-img" />
-      <div class="bar-container"><div class="health-bar" id="enemy-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="enemy-mana"></div></div>
-      <p id="enemy-hp">HP: 100</p>
-      <p id="enemy-mp">Mana: 0</p>
-    </div>
+  <div class="character-wrapper" style="display:none;">
+    <!-- player-info and enemy-info as you already have -->
   </div>
 
   <div id="log"></div>
-  <button id="return-button" onclick="window.returnToMenu()">Return to Menu</button>
+  <button id="return-button" style="display:none;" onclick="window.returnToMenu()">Return to Menu</button>
 
   <audio id="fire-sound" src="fire.mp3"></audio>
   <audio id="punch-sound" src="punch.mp3"></audio>
@@ -173,7 +37,6 @@
   <audio id="bg-music" src="background.mp3" loop></audio>
 
 <script>
-// --- GLOBAL NESNELERİ TANIMLA ---
 window.player = {
   hp: 100,
   mana: 0,
@@ -185,7 +48,6 @@ window.player = {
     { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
   ]
 };
-
 window.enemy = {
   hp: 120,
   mana: 0,
@@ -197,14 +59,11 @@ window.enemy = {
     { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
   ]
 };
-
 window.gameScore = 0;
 window.earnedTokens = 0;
 window.userAddress = null;
-// BURAYI GERÇEK BACKEND ADRESİNLE DEĞİŞTİR
 window.BACKEND_URL = "https://kryptomon-backend.onrender.com";
 
-// --- CONNECT WALLET FONKSİYONU ---
 window.connectWallet = async function() {
   if (!window.ethereum) {
     alert("Please install MetaMask or another Ethereum wallet!");
@@ -215,19 +74,19 @@ window.connectWallet = async function() {
     window.userAddress = accounts[0];
     document.getElementById("wallet-address").textContent = "Wallet: " + window.userAddress;
     window.log("Wallet connected: " + window.userAddress);
-    window.fetchZ1n3dBalance();
+    await window.fetchZ1n3dBalance();
+    await window.fetchGameEarned();
   } catch (error) {
     console.error(error);
     window.log("Wallet connection failed.");
   }
 };
 
-// --- Z1N3D BAKİYE GETİR ---
 window.fetchZ1n3dBalance = async function() {
   if (!window.userAddress) return;
   try {
-    const response = await fetch(window.BACKEND_URL + "/balance?wallet=" + window.userAddress);
-    const data = await response.json();
+    const res = await fetch(window.BACKEND_URL + "/balance?wallet=" + window.userAddress);
+    const data = await res.json();
     if (data.balance !== undefined) {
       document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
     }
@@ -236,16 +95,26 @@ window.fetchZ1n3dBalance = async function() {
   }
 };
 
-// --- LOG YAZDIR ---
+window.fetchGameEarned = async function() {
+  if (!window.userAddress) return;
+  try {
+    const res = await fetch(window.BACKEND_URL + "/earned?wallet=" + window.userAddress);
+    const data = await res.json();
+    if (data.earned !== undefined) {
+      document.getElementById("game-balance").textContent = "Game Earned: " + Number(data.earned).toFixed(4);
+    }
+  } catch {
+    window.log("Failed to fetch game earned tokens.");
+  }
+};
+
 window.log = function(text) {
   const logDiv = document.getElementById("log");
   logDiv.innerHTML += text + "<br>";
   logDiv.scrollTop = logDiv.scrollHeight;
 };
 
-// --- BARS GÜNCELLE ---
 window.updateBars = function() {
-  // Player
   const playerHpPercent = Math.max(0, window.player.hp) / 100 * 100;
   const playerManaPercent = Math.min(100, window.player.mana);
   document.getElementById("player-health").style.width = playerHpPercent + "%";
@@ -253,7 +122,6 @@ window.updateBars = function() {
   document.getElementById("player-hp").textContent = `HP: ${Math.max(0, window.player.hp)}`;
   document.getElementById("player-mp").textContent = `Mana: ${Math.min(100, window.player.mana)}`;
 
-  // Enemy
   const enemyHpPercent = Math.max(0, window.enemy.hp) / 120 * 100;
   const enemyManaPercent = Math.min(100, window.enemy.mana);
   document.getElementById("enemy-health").style.width = enemyHpPercent + "%";
@@ -261,11 +129,9 @@ window.updateBars = function() {
   document.getElementById("enemy-hp").textContent = `HP: ${Math.max(0, window.enemy.hp)}`;
   document.getElementById("enemy-mp").textContent = `Mana: ${Math.min(100, window.enemy.mana)}`;
 
-  // Skor
   document.getElementById("score-count").textContent = "Score: " + window.gameScore.toFixed(0);
 };
 
-// --- SES OYNAT ---
 window.playSound = function(name) {
   const sounds = {
     Fireball: "fire-sound",
@@ -281,7 +147,6 @@ window.playSound = function(name) {
   }
 };
 
-// --- Saldırı fonksiyonu ---
 let attackInProgress = false;
 window.attack = function(i) {
   if (attackInProgress) return;
@@ -305,9 +170,8 @@ window.attack = function(i) {
   window.updateBars();
   if (window.enemy.hp <= 0) return window.endGame(true);
   setTimeout(window.enemyTurn, 1000);
-}
+};
 
-// --- Savunma fonksiyonu ---
 window.useDefense = function() {
   if (attackInProgress) return;
   attackInProgress = true;
@@ -323,14 +187,12 @@ window.useDefense = function() {
   window.log("Defense spell active!");
   window.updateBars();
   setTimeout(window.enemyTurn, 1000);
-}
+};
 
 window.enemyTurn = function() {
-  // Spam engelleme
   if (attackInProgress) return;
   attackInProgress = true;
 
-  // Eğer canı %30'un altındaysa ve mana varsa savunma yap
   if (window.enemy.hp / 120 < 0.3 && window.enemy.mana >= 20 && !window.enemy.defense) {
     window.enemy.mana -= 20;
     window.enemy.defense = true;
@@ -342,16 +204,13 @@ window.enemyTurn = function() {
     return;
   }
 
-  // Kullanabileceği büyüler arasından en güçlü hasar veren büyüyü seç (mana yetiyorsa)
   const canAttack = window.enemy.attacks.filter(a => a.manaCost <= window.enemy.mana && a.damage > 0);
   let atk = null;
   if (canAttack.length) {
-    // En yüksek hasar veren saldırıyı bul
     atk = canAttack.reduce((max, a) => a.damage > max.damage ? a : max, canAttack[0]);
   }
 
   if (!atk) {
-    // Eğer saldırı yapamıyorsa mana kazanma büyüsü varsa onu kullan
     const manaGainAttack = window.enemy.attacks.find(a => a.manaGain > 0);
     if (manaGainAttack) {
       window.enemy.mana += manaGainAttack.manaGain;
@@ -360,15 +219,12 @@ window.enemyTurn = function() {
       attackInProgress = false;
       return;
     }
-
-    // Mana kazanma büyüsü yoksa mana yükle
     window.enemy.mana += 15;
     window.log("Enemy charges mana...");
     attackInProgress = false;
     return;
   }
 
-  // Saldırıyı uygula
   window.enemy.mana -= atk.manaCost;
   let dmg = atk.damage;
   const crit = Math.random() < 0.2;
@@ -389,10 +245,8 @@ window.enemyTurn = function() {
   attackInProgress = false;
 
   if (window.player.hp <= 0) window.endGame(false);
-}
+};
 
-
-// --- Efekt gösterimi ---
 function showEffect(targetId, text) {
   const el = document.getElementById(targetId);
   const fx = document.createElement("div");
@@ -402,60 +256,76 @@ function showEffect(targetId, text) {
   setTimeout(() => fx.remove(), 1000);
 }
 
-// --- Oyun bitişi ---
-window.endGame = async function(win) {
-  document.querySelector(".character-wrapper").style.display = "none";
-  document.getElementById("return-button").style.display = "inline-block";
-  window.log(win ? "🎉 You won!" : "💀 You lost!");
-  document.getElementById("bg-music").pause();
-  const points = win ? 100 : -100;
-  window.gameScore += points;
-  window.updateBars();
-  if (window.userAddress && points > 0) {
-    try {
-      const response = await fetch(window.BACKEND_URL + "/claim", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet: window.userAddress, score: points }),
-      });
-      const data = await response.json();
-      if (data.tokens) {
-        window.earnedTokens += data.tokens;
-        window.log(`You earned ${data.tokens} tokens!`);
-        window.fetchZ1n3dBalance();
-      }
-    } catch {
-      window.log("Token claim failed.");
+// ** BURASI ÖNEMLİ: Günlük 0.1 token limit + spam koruma ile claim fonksiyonu **
+window.claimTokens = async function(score) {
+  if (!window.userAddress) return;
+  try {
+    const response = await fetch(window.BACKEND_URL + "/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: window.userAddress, score }),
+    });
+    const data = await response.json();
+
+    if (data.error) {
+      alert("Claim error: " + data.error);
+      return;
     }
+    window.earnedTokens += Number(data.claimed || 0);
+    document.getElementById("game-balance").textContent = "Game Earned: " + window.earnedTokens.toFixed(4);
+    alert("Claim successful! Tokens earned: " + data.claimed);
+  } catch (e) {
+    alert("Claim failed. Try again later.");
   }
 };
 
-// --- Menüyü göster ---
-window.returnToMenu = function() {
-  document.getElementById("return-button").style.display = "none";
-  document.getElementById("main-menu").style.display = "block";
+// Oyun bittiğinde çağrılır
+window.endGame = function(playerWon) {
+  attackInProgress = true;
+
+  if (playerWon) {
+    window.gameScore += 10; // Örnek skor artışı
+    window.log("You won! Score: " + window.gameScore);
+    if (window.userAddress) {
+      window.claimTokens(window.gameScore);
+    }
+  } else {
+    window.log("You lost!");
+  }
+  document.querySelector(".character-wrapper").style.display = "none";
+  document.getElementById("return-button").style.display = "inline-block";
+  attackInProgress = false;
 };
 
-// --- Oyunu başlat ---
-window.startGame = function() {
+window.returnToMenu = function() {
+  document.getElementById("main-menu").style.display = "block";
+  document.getElementById("return-button").style.display = "none";
+  window.resetGame();
+};
+
+window.resetGame = function() {
   window.player.hp = 100;
   window.player.mana = 0;
   window.player.defense = false;
-  window.player.defenseTurns = 0;
   window.enemy.hp = 120;
   window.enemy.mana = 0;
   window.enemy.defense = false;
-  window.enemy.defenseTurns = 0;
-  attackInProgress = false;
-  document.getElementById("main-menu").style.display = "none";
-  document.querySelector(".character-wrapper").style.display = "flex";
-  document.getElementById("bg-music").currentTime = 0;
-  document.getElementById("bg-music").play();
-  window.log("Game started!");
+  window.gameScore = 0;
+  window.earnedTokens = 0;
   window.updateBars();
+  document.getElementById("log").innerHTML = "";
 };
+
+window.startGame = function() {
+  document.getElementById("main-menu").style.display = "none";
+  document.querySelector(".character-wrapper").style.display = "block";
+  window.resetGame();
+  window.updateBars();
+  document.getElementById("log").innerHTML = "Battle started!<br>";
+  document.getElementById("bg-music").play();
+};
+
+window.connectWallet();
 </script>
-
-
 </body>
 </html>
