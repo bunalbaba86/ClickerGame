@@ -2,436 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kryptomon Battle Game</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Combat Game</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      background: url('my_image.jpg') center/cover no-repeat;
+      font-family: 'Arial', sans-serif;
+      background-color: #1e1e2f;
       color: white;
-    }
-    #wallet-bar {
-      position: fixed;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 12px;
-      border-radius: 12px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      z-index: 1000;
-    }
-    #wallet-bar button {
-      background: gold;
-      border: none;
-      padding: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-    .character-wrapper {
-      display: none;
-      justify-content: space-between;
       align-items: center;
-      gap: 80px;
-      margin-top: 50px;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding-top: 20px;
     }
-    .character {
-      width: 200px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      padding: 10px;
-      margin: 10px;
-      position: relative;
+
+    h1 {
+      margin-bottom: 20px;
     }
-    .bar-container {
-      width: 200px;
-      height: 20px;
-      background-color: #ddd;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px auto;
-      overflow: hidden;
-    }
-    .health-bar, .mana-bar {
-      height: 100%;
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
       width: 100%;
-      border-radius: 5px;
-      transition: width 0.3s ease;
+      max-width: 800px;
     }
-    .health-bar { background-color: #e53935; }
-    .mana-bar { background-color: #1e88e5; }
-    .attack-btn {
-      background: #ff7e5f;
-      border: none;
-      margin: 5px;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
+
+    .character {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
     }
-    #main-menu button {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      background: orange;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
+
+    .health-bar {
+      width: 150px;
+      height: 25px;
+      background-color: red;
+      border: 2px solid white;
+      margin-top: 10px;
     }
-    #log {
+
+    .health-fill {
+      height: 100%;
+      background-color: limegreen;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
       margin-top: 20px;
-      min-height: 50px;
-      background-color: rgba(0,0,0,0.5);
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      max-height: 150px;
-      overflow-y: auto;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    .pokemon-image {
-      width: 180px;
-      margin: 10px auto;
-    }
-    .attack-effect {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      color: yellow;
-      animation: hitEffect 1s ease-out forwards;
-    }
-    @keyframes hitEffect {
-      0% { opacity: 1; transform: translate(-50%, -20px); }
-      100% { opacity: 0; transform: translate(-50%, -60px); }
-    }
-    #return-button {
-      display: none;
-      margin-top: 20px;
+
+    .actions button {
       padding: 10px 20px;
-      font-size: 1rem;
-      background: red;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
+      background-color: #3498db;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    .actions button:hover {
+      background-color: #2980b9;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .image {
+      width: 100px;
+      height: 100px;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 10px;
+    }
+
+    .player-image {
+      background-image: url('https://via.placeholder.com/100x100.png?text=Player');
+    }
+
+    .enemy-image {
+      background-image: url('https://via.placeholder.com/100x100.png?text=Enemy');
     }
   </style>
 </head>
 <body>
-  <div id="wallet-bar">
-    <span id="wallet-address">Not connected</span>
-    <span id="z1n3d-balance">Z1N3D: -</span>
-    <span id="game-balance">Game Earned: 0.0000</span>
-    <span id="score-count">Score: 0</span>
-    <button onclick="window.connectWallet()">Connect Wallet</button>
-  </div>
-
-  <div id="main-menu">
-    <h1>🔥 Kryptomon Battle Game 🔥</h1>
-    <button onclick="window.startGame()">START</button>
-  </div>
-
-  <div class="character-wrapper">
-    <div class="character" id="player-info">
-      <h2>You</h2>
-      <img src="player-pokemon.png" class="pokemon-image" id="player-img" />
-      <div class="bar-container"><div class="health-bar" id="player-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="player-mana"></div></div>
-      <p id="player-hp">HP: 100</p>
-      <p id="player-mp">Mana: 0</p>
-      <button class="attack-btn" onclick="window.attack(0)">Fireball</button>
-      <button class="attack-btn" onclick="window.attack(1)">Punch</button>
-      <button class="attack-btn" onclick="window.attack(2)">Howl</button>
-      <button class="attack-btn" onclick="window.useDefense()">Defend</button>
+  <h1>Combat Game</h1>
+  <div class="container">
+    <div class="character">
+      <div class="image player-image"></div>
+      <div class="health-bar">
+        <div id="playerHealth" class="health-fill" style="width: 100%;"></div>
+      </div>
     </div>
-    <div class="character" id="enemy-info">
-      <h2>Enemy</h2>
-      <img src="enemy-pokemon2.png" class="pokemon-image" id="enemy-img" />
-      <div class="bar-container"><div class="health-bar" id="enemy-health"></div></div>
-      <div class="bar-container"><div class="mana-bar" id="enemy-mana"></div></div>
-      <p id="enemy-hp">HP: 100</p>
-      <p id="enemy-mp">Mana: 0</p>
+    <div class="character">
+      <div class="image enemy-image"></div>
+      <div class="health-bar">
+        <div id="enemyHealth" class="health-fill" style="width: 100%;"></div>
+      </div>
     </div>
   </div>
 
-  <div id="log"></div>
-  <button id="return-button" onclick="window.returnToMenu()">Return to Menu</button>
+  <div class="actions">
+    <button onclick="attack()">Attack</button>
+    <button onclick="specialAttack()">Special Attack</button>
+    <button onclick="heal()">Heal</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
 
-  <audio id="fire-sound" src="fire.mp3"></audio>
-  <audio id="punch-sound" src="punch.mp3"></audio>
-  <audio id="basic-sound" src="basic.mp3"></audio>
-  <audio id="defense-sound" src="defense.mp3"></audio>
-  <audio id="bg-music" src="background.mp3" loop></audio>
+  <div id="result"></div>
 
-<script>
-// --- GLOBAL NESNELERİ TANIMLA ---
-window.player = {
-  hp: 100,
-  mana: 0,
-  defense: false,
-  defenseTurns: 0,
-  attacks: [
-    { name: "Fireball", damage: 35, manaCost: 30, manaGain: 0 },
-    { name: "Punch", damage: 10, manaCost: 10, manaGain: 0 },
-    { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
-  ]
-};
+  <script>
+    let playerHP = 100;
+    let enemyHP = 100;
+    const maxHP = 100;
 
-window.enemy = {
-  hp: 120,
-  mana: 0,
-  defense: false,
-  defenseTurns: 0,
-  attacks: [
-    { name: "Fireball", damage: 35, manaCost: 30, manaGain: 0 },
-    { name: "Punch", damage: 15, manaCost: 10, manaGain: 0 },
-    { name: "Howl", damage: 0, manaCost: 0, manaGain: 100 }
-  ]
-};
-
-window.gameScore = 0;
-window.earnedTokens = 0;
-window.userAddress = null;
-// BURAYI GERÇEK BACKEND ADRESİNLE DEĞİŞTİR
-window.BACKEND_URL = "https://kryptomon-backend.onrender.com";
-
-// --- CONNECT WALLET FONKSİYONU ---
-window.connectWallet = async function() {
-  if (!window.ethereum) {
-    alert("Please install MetaMask or another Ethereum wallet!");
-    return;
-  }
-  try {
-    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-    window.userAddress = accounts[0];
-    document.getElementById("wallet-address").textContent = "Wallet: " + window.userAddress;
-    window.log("Wallet connected: " + window.userAddress);
-    window.fetchZ1n3dBalance();
-  } catch (error) {
-    console.error(error);
-    window.log("Wallet connection failed.");
-  }
-};
-
-// --- Z1N3D BAKİYE GETİR ---
-window.fetchZ1n3dBalance = async function() {
-  if (!window.userAddress) return;
-  try {
-    const response = await fetch(window.BACKEND_URL + "/balance?wallet=" + window.userAddress);
-    const data = await response.json();
-    if (data.balance !== undefined) {
-      document.getElementById("z1n3d-balance").textContent = "Z1N3D: " + data.balance;
+    function updateHealthBars() {
+      document.getElementById('playerHealth').style.width = playerHP + '%';
+      document.getElementById('enemyHealth').style.width = enemyHP + '%';
     }
-  } catch {
-    window.log("Failed to fetch Z1N3D balance.");
-  }
-};
 
-// --- LOG YAZDIR ---
-window.log = function(text) {
-  const logDiv = document.getElementById("log");
-  logDiv.innerHTML += text + "<br>";
-  logDiv.scrollTop = logDiv.scrollHeight;
-};
+    function attack() {
+      const playerDamage = Math.floor(Math.random() * 10) + 5;
+      const enemyDamage = Math.floor(Math.random() * 10) + 5;
 
-// --- BARS GÜNCELLE ---
-window.updateBars = function() {
-  // Player
-  const playerHpPercent = Math.max(0, window.player.hp) / 100 * 100;
-  const playerManaPercent = Math.min(100, window.player.mana);
-  document.getElementById("player-health").style.width = playerHpPercent + "%";
-  document.getElementById("player-mana").style.width = playerManaPercent + "%";
-  document.getElementById("player-hp").textContent = `HP: ${Math.max(0, window.player.hp)}`;
-  document.getElementById("player-mp").textContent = `Mana: ${Math.min(100, window.player.mana)}`;
+      enemyHP = Math.max(0, enemyHP - playerDamage);
+      playerHP = Math.max(0, playerHP - enemyDamage);
 
-  // Enemy
-  const enemyHpPercent = Math.max(0, window.enemy.hp) / 120 * 100;
-  const enemyManaPercent = Math.min(100, window.enemy.mana);
-  document.getElementById("enemy-health").style.width = enemyHpPercent + "%";
-  document.getElementById("enemy-mana").style.width = enemyManaPercent + "%";
-  document.getElementById("enemy-hp").textContent = `HP: ${Math.max(0, window.enemy.hp)}`;
-  document.getElementById("enemy-mp").textContent = `Mana: ${Math.min(100, window.enemy.mana)}`;
-
-  // Skor
-  document.getElementById("score-count").textContent = "Score: " + window.gameScore.toFixed(0);
-};
-
-// --- SES OYNAT ---
-window.playSound = function(name) {
-  const sounds = {
-    Fireball: "fire-sound",
-    Punch: "punch-sound",
-    Howl: "basic-sound",
-    Defend: "defense-sound"
-  };
-  const soundId = sounds[name];
-  if (soundId) {
-    const audio = document.getElementById(soundId);
-    audio.currentTime = 0;
-    audio.play();
-  }
-};
-// GÜNCELLEMELER İÇİN BASİT KOD --- 
-window.showEffect = function(targetId, text) {
-  const el = document.getElementById(targetId);
-  const fx = document.createElement("div");
-  fx.className = "attack-effect";
-  fx.textContent = text > 0 ? `-${text}` : "+Mana";
-  el.parentNode.appendChild(fx);
-  setTimeout(() => fx.remove(), 1000);
-};
-
-// --- DÜŞMAN SALDIRISI ---
-window.enemyAttack = function() {
-  // Basit yapay zeka: Mana yeterliyse Fireball yapar, değilse Punch, mana doluysa Howl
-  let attack;
-  if (window.enemy.mana >= 30) {
-    attack = window.enemy.attacks[0]; // Fireball
-  } else if (window.enemy.mana < 100) {
-    attack = window.enemy.attacks[2]; // Howl
-  } else {
-    attack = window.enemy.attacks[1]; // Punch
-  }
-
-  if (attack.name === "Howl") {
-    window.enemy.mana = Math.min(100, window.enemy.mana + attack.manaGain);
-    window.log("Enemy used Howl and gained mana!");
-    showEffect("enemy-info", 0);
-    window.playSound(attack.name);
-  } else {
-    if (window.player.defense) {
-      window.player.hp -= Math.floor(attack.damage / 2);
-      window.player.defenseTurns--;
-      if (window.player.defenseTurns <= 0) window.player.defense = false;
-      window.log(`Enemy used ${attack.name} but your defense halved the damage!`);
-      showEffect("player-info", Math.floor(attack.damage / 2));
-    } else {
-      window.player.hp -= attack.damage;
-      window.log(`Enemy used ${attack.name} and dealt ${attack.damage} damage!`);
-      showEffect("player-info", attack.damage);
+      updateHealthBars();
+      checkWinner();
     }
-    window.enemy.mana = Math.max(0, window.enemy.mana - attack.manaCost);
-    window.playSound(attack.name);
-  }
-  window.updateBars();
-  window.checkGameOver();
-};
 
-// --- OYUN BİTİŞİ KONTROLÜ ---
-window.checkGameOver = function() {
-  if (window.player.hp <= 0) {
-    window.endGame(false);
-  } else if (window.enemy.hp <= 0) {
-    window.endGame(true);
-  }
-};
+    function specialAttack() {
+      const playerDamage = Math.floor(Math.random() * 20) + 10;
+      const enemyDamage = Math.floor(Math.random() * 15) + 5;
 
-// --- OYUN BİTİŞİ ---
-window.endGame = async function(win) {
-  window.log(win ? "You won! Congratulations!" : "You lost! Try again!");
-  // Puan hesaplama
-  let points = 0;
-  if (win) points = Math.floor(window.player.hp * 10 + window.player.mana);
-  window.gameScore += points;
-  window.updateBars();
-  // Claim token (backend'e istek)
-  if (window.userAddress && points > 0) {
-    try {
-      const response = await fetch(window.BACKEND_URL + "/claim", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet: window.userAddress, score: points }),
-      });
-      const data = await response.json();
-      if (data.tokens) {
-        window.earnedTokens += data.tokens;
-        window.log(`You earned ${data.tokens} tokens!`);
-        window.fetchZ1n3dBalance();
+      enemyHP = Math.max(0, enemyHP - playerDamage);
+      playerHP = Math.max(0, playerHP - enemyDamage);
+
+      updateHealthBars();
+      checkWinner();
+    }
+
+    function heal() {
+      const healAmount = Math.floor(Math.random() * 10) + 10;
+      playerHP = Math.min(maxHP, playerHP + healAmount);
+
+      const enemyDamage = Math.floor(Math.random() * 10) + 5;
+      playerHP = Math.max(0, playerHP - enemyDamage);
+
+      updateHealthBars();
+      checkWinner();
+    }
+
+    function resetGame() {
+      playerHP = 100;
+      enemyHP = 100;
+      updateHealthBars();
+      document.getElementById('result').innerText = '';
+    }
+
+    function checkWinner() {
+      const result = document.getElementById('result');
+      if (playerHP <= 0 && enemyHP <= 0) {
+        result.innerText = "It's a draw!";
+      } else if (playerHP <= 0) {
+        result.innerText = "You lost!";
+      } else if (enemyHP <= 0) {
+        result.innerText = "You won!";
       }
-    } catch {
-      window.log("Token claim failed.");
     }
-  }
 
-  // Oyun karakterlerini gizle, menüyü göster
-  document.querySelector(".character-wrapper").style.display = "none";
-  document.getElementById("return-button").style.display = "inline-block";
-  document.getElementById("main-menu").style.display = "block";
-};
-
-// --- SAVUNMA FONKSİYONU ---
-window.useDefense = function() {
-  window.player.defense = true;
-  window.player.defenseTurns = 2;
-  window.log("You activated defense! Damage will be halved for 2 turns.");
-  window.playSound("Defend");
-};
-
-// --- SALDIRI FONKSİYONU ---
-window.attack = function(attackIndex) {
-  const attack = window.player.attacks[attackIndex];
-  if (window.player.mana < attack.manaCost) {
-    window.log("Not enough mana for " + attack.name);
-    return;
-  }
-  if (attack.name === "Howl") {
-    window.player.mana = Math.min(100, window.player.mana + attack.manaGain);
-    window.log("You used Howl and gained mana!");
-    showEffect("player-info", 0);
-  } else {
-    let damage = attack.damage;
-    if (window.enemy.defense) {
-      damage = Math.floor(damage / 2);
-      window.enemy.defenseTurns--;
-      if (window.enemy.defenseTurns <= 0) window.enemy.defense = false;
-      window.log("Enemy defense halved your damage!");
+    // Başlangıçta sağlık barlarını ayarla
+    function startGame() {
+      playerHP = 100;
+      enemyHP = 100;
+      updateHealthBars();
+      document.getElementById('result').innerText = '';
     }
-    window.enemy.hp -= damage;
-    window.log(`You used ${attack.name} and dealt ${damage} damage!`);
-    showEffect("enemy-info", damage);
-  }
-  window.player.mana = Math.max(0, window.player.mana - attack.manaCost);
-  window.playSound(attack.name);
-  window.updateBars();
-  window.checkGameOver();
-  setTimeout(() => {
-    window.enemyAttack();
-  }, 1000);
-};
 
-// --- OYUN BAŞLAT ---
-window.startGame = function() {
-  window.player.hp = 100;
-  window.player.mana = 0;
-  window.player.defense = false;
-  window.player.defenseTurns = 0;
-  window.enemy.hp = 120;
-  window.enemy.mana = 0;
-  window.enemy.defense = false;
-  window.enemy.defenseTurns = 0;
-  window.gameScore = 0;
-  document.querySelector(".character-wrapper").style.display = "flex";
-  document.getElementById("main-menu").style.display = "none";
-  document.getElementById("return-button").style.display = "none";
-  window.updateBars();
-  window.log("Game started! Fight!");
-};
-
-// --- MENUYE DON ---
-window.returnToMenu = function() {
-  document.querySelector(".character-wrapper").style.display = "none";
-  document.getElementById("main-menu").style.display = "block";
-  document.getElementById("return-button").style.display = "none";
-  window.log("Returned to menu.");
-};
-</script>
+    startGame();
+  </script>
 </body>
 </html>
